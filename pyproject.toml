@@ -1,0 +1,48 @@
+[project]
+name = "quant-job-agent"
+dynamic = ["version"]  # из git-тега vX.Y.Z (hatch-vcs)
+description = "Агент поиска стажировок и graduate-позиций в HFT и квант-фондах Европы и UK: watchlist фирм, оценка через LLM, отклики"
+requires-python = ">=3.11"
+license = "MIT"
+license-files = ["LICENSE"]
+dependencies = [
+    "anthropic>=0.70",
+    "markdown>=3.6",
+    "pdfminer-six>=20240706",
+    "playwright>=1.48",
+    "pydantic>=2.7",
+    "pyyaml>=6.0",
+    "rich>=13.7",
+]
+
+[project.scripts]
+quant-agent = "quant_agent.cli:main"
+
+[build-system]
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+source = "vcs"
+fallback-version = "0.0.0"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+    "ruff>=0.15",
+]
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
+# E501: длинные строки допустимы; E731: короткие lambda; B904: raise SystemExit с понятным сообщением.
+ignore = ["E501", "E731", "B904"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["quant_agent"]

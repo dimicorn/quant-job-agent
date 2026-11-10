@@ -1,0 +1,267 @@
+{
+ "data": {
+  "jobPosting": {
+   "id": "702c3699-5175-4e7b-af1c-447068ca365b",
+   "title": "Senior Manager, Learning and Development",
+   "applicationForm": {
+    "id": "dfc56753-3de1-4b73-8090-ad90b07a3e0e",
+    "sections": [
+     {
+      "title": null,
+      "fieldEntries": [
+       {
+        "id": "dfc56753-3de1-4b73-8090-ad90b07a3e0e__systemfield_resume",
+        "field": {
+         "id": "2f987c1c-8edf-4949-8783-310c629ddc1b",
+         "path": "_systemfield_resume",
+         "humanReadablePath": "Resume",
+         "title": "Resume",
+         "isNullable": false,
+         "isPrivate": false,
+         "isDeactivated": false,
+         "isMany": false,
+         "metadata": {},
+         "type": "File",
+         "__autoSerializationID": "FileField"
+        },
+        "isRequired": true,
+        "isHidden": null
+       },
+       {
+        "id": "dfc56753-3de1-4b73-8090-ad90b07a3e0e__systemfield_name",
+        "field": {
+         "id": "6ae1cd25-c8bd-4986-8d63-66ef7bdfe9e1",
+         "path": "_systemfield_name",
+         "humanReadablePath": "Name",
+         "title": "Full Name",
+         "isNullable": false,
+         "isPrivate": false,
+         "isDeactivated": false,
+         "isMany": false,
+         "metadata": {},
+         "type": "String",
+         "__autoSerializationID": "StringField"
+        },
+        "isRequired": true,
+        "isHidden": null
+       },
+       {
+        "id": "dfc56753-3de1-4b73-8090-ad90b07a3e0e__systemfield_email",
+        "field": {
+         "id": "db2d7a97-b2c6-4d32-ae62-185909ca5529",
+         "path": "_systemfield_email",
+         "humanReadablePath": "Email",
+         "title": "Email",
+         "isNullable": false,
+         "isPrivate": false,
+         "isDeactivated": false,
+         "isMany": false,
+         "metadata": {},
+         "type": "Email",
+         "__autoSerializationID": "EmailField"
+        },
+        "isRequired": true,
+        "isHidden": null
+       },
+       {
+        "id": "dfc56753-3de1-4b73-8090-ad90b07a3e0e_56d78818-a3c3-4010-ad4c-c03bf11a09bf",
+        "field": {
+         "id": "dbd60473-6429-4768-854b-2126cafc7d4f",
+         "path": "56d78818-a3c3-4010-ad4c-c03bf11a09bf",
+         "humanReadablePath": "",
+         "title": "Phone Number",
+         "isNullable": false,
+         "isPrivate": false,
+         "isDeactivated": false,
+         "isMany": false,
+         "metadata": {},
+         "type": "Phone",
+         "__autoSerializationID": "PhoneField"
+        },
+        "isRequired": false,
+        "isHidden": null
+       },
+       {
+        "id": "dfc56753-3de1-4b73-8090-ad90b07a3e0e__systemfield_location",
+        "field": {
+         "id": "55e37621-9ee6-41c1-984e-21094ea3fdda",
+         "path": "_systemfield_location",
+         "humanReadablePath": "Location",
+         "title": "Current Location",
+         "isNullable": false,
+         "isPrivate": false,
+         "isDeactivated": false,
+         "isMany": false,
+         "metadata": {},
+         "type": "Location",
+         "locationTypes": [
+          "Country",
+          "Region",
+          "City"
+         ],
+         "__autoSerializationID": "LocationField"
+        },
+        "isRequired": true,
+        "isHidden": null
+       },
+       {
+        "id": "dfc56753-3de1-4b73-8090-ad90b07a3e0e_7f44f5ec-65b8-4fbe-9e13-ff83988191ee",
+        "field": {
+         "id": "0d3ab753-c2ec-4c0e-96b8-37e4a60bfce9",
+         "path": "7f44f5ec-65b8-4fbe-9e13-ff83988191ee",
+         "humanReadablePath": "",
+         "title": "Current Company",
+         "isNullable": false,
+         "isPrivate": false,
+         "isDeactivated": false,
+         "isMany": false,
+         "metadata": {},
+         "type": "String",
+         "__autoSerializationID": "StringField"
+        },
+        "isRequired": false,
+        "isHidden": null
+       }
+      ]
+     },
+     {
+      "title": "Links",
+      "fieldEntries": [
+       {
+        "id": "dfc56753-3de1-4b73-8090-ad90b07a3e0e_4f633dcb-feb3-4986-8c18-6fa770614ff4",
+        "field": {
+         "id": "abcdb041-e8d1-4eb3-8688-ff0b17c86d93",
+         "path": "4f633dcb-feb3-4986-8c18-6fa770614ff4",
+         "humanReadablePath": "",
+         "title": "LinkedIn",
+         "isNullable": false,
+         "isPrivate": false,
+         "isDeactivated": false,
+         "isMany": false,
+         "metadata": {},
+         "type": "String",
+         "__autoSerializationID": "StringField"
+        },
+        "isRequired": false,
+        "isHidden": null
+       },
+       {
+        "id": "dfc56753-3de1-4b73-8090-ad90b07a3e0e_3c9794ca-0102-47c1-ade6-29b6b42995e5",
+        "field": {
+         "id": "7103112a-c5ea-4521-a4f1-6d615114b0ad",
+         "path": "3c9794ca-0102-47c1-ade6-29b6b42995e5",
+         "humanReadablePath": "",
+         "title": "GitHub",
+         "isNullable": false,
+         "isPrivate": false,
+         "isDeactivated": false,
+         "isMany": false,
+         "metadata": {},
+         "type": "String",
+         "__autoSerializationID": "StringField"
+        },
+        "isRequired": false,
+        "isHidden": null
+       },
+       {
+        "id": "dfc56753-3de1-4b73-8090-ad90b07a3e0e_a264028d-2e8b-4f65-8edf-36e9b9cad909",
+        "field": {
+         "id": "c174ed53-7c1d-4ee8-b7c6-26255262aae0",
+         "path": "a264028d-2e8b-4f65-8edf-36e9b9cad909",
+         "humanReadablePath": "",
+         "title": "Portfolio",
+         "isNullable": false,
+         "isPrivate": false,
+         "isDeactivated": false,
+         "isMany": false,
+         "metadata": {},
+         "type": "String",
+         "__autoSerializationID": "StringField"
+        },
+        "isRequired": false,
+        "isHidden": null
+       },
+       {
+        "id": "dfc56753-3de1-4b73-8090-ad90b07a3e0e_366fa460-5253-45db-8360-f16e0f0bfa6e",
+        "field": {
+         "id": "f5f35264-1801-4245-8a7c-44517b8cc16a",
+         "path": "366fa460-5253-45db-8360-f16e0f0bfa6e",
+         "humanReadablePath": "",
+         "title": "Other",
+         "isNullable": false,
+         "isPrivate": false,
+         "isDeactivated": false,
+         "isMany": false,
+         "metadata": {},
+         "type": "String",
+         "__autoSerializationID": "StringField"
+        },
+        "isRequired": false,
+        "isHidden": null
+       }
+      ]
+     },
+     {
+      "title": null,
+      "fieldEntries": [
+       {
+        "id": "dfc56753-3de1-4b73-8090-ad90b07a3e0e_ab7aeaee-8af3-4206-9ab1-a5c32cf1db07",
+        "field": {
+         "id": "ec1734e9-466b-47ed-9b70-13ec21ca4e6e",
+         "path": "ab7aeaee-8af3-4206-9ab1-a5c32cf1db07",
+         "humanReadablePath": "",
+         "title": "Are you legally authorized to work in the United States?",
+         "isNullable": false,
+         "isPrivate": false,
+         "isDeactivated": false,
+         "isMany": false,
+         "metadata": {},
+         "type": "Boolean",
+         "__autoSerializationID": "BooleanField"
+        },
+        "isRequired": true,
+        "isHidden": null
+       },
+       {
+        "id": "dfc56753-3de1-4b73-8090-ad90b07a3e0e_2fb8c9e5-1b12-420d-a93c-e6f794772ece",
+        "field": {
+         "id": "8d784aa0-a963-4b92-bb13-9e64c6698c09",
+         "path": "2fb8c9e5-1b12-420d-a93c-e6f794772ece",
+         "humanReadablePath": "",
+         "title": "Will you now or in the future require visa sponsorship?",
+         "isNullable": false,
+         "isPrivate": false,
+         "isDeactivated": false,
+         "isMany": false,
+         "metadata": {},
+         "type": "Boolean",
+         "__autoSerializationID": "BooleanField"
+        },
+        "isRequired": true,
+        "isHidden": null
+       },
+       {
+        "id": "dfc56753-3de1-4b73-8090-ad90b07a3e0e_581f948b-f517-443d-91c4-1f5530edc42d",
+        "field": {
+         "id": "ff3aa9ee-63ff-4b08-8579-26ac237ffab8",
+         "path": "581f948b-f517-443d-91c4-1f5530edc42d",
+         "humanReadablePath": "",
+         "title": "If you require sponsorship now or in the future, please provide more detail.",
+         "isNullable": false,
+         "isPrivate": false,
+         "isDeactivated": false,
+         "isMany": false,
+         "metadata": {},
+         "type": "LongText",
+         "__autoSerializationID": "LongTextField"
+        },
+        "isRequired": false,
+        "isHidden": null
+       }
+      ]
+     }
+    ]
+   }
+  }
+ }
+}

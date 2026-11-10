@@ -1,0 +1,27 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.DS_Store
+*.bak
+*.tmp
+# личное — в git не попадает
+config.yaml
+answers.yaml
+.browser-profile/
+resume.md
+resume_*.md
+!resume.example.md
+.env
+*.db
+*.db-*
+logs/
+debug/
+.llm-limits.json
+materials/
+
+# резервные копии личных файлов
+*.bak
+*.bak-*
+*.bak[0-9]

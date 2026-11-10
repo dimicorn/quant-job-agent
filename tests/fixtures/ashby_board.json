@@ -1,0 +1,137 @@
+{
+ "apiVersion": "1",
+ "jobs": [
+  {
+   "id": "f9de4f71-c0f8-4de4-8f88-0ee8072d1e7a",
+   "title": "Senior Member of Research Staff (London)",
+   "department": "Research",
+   "team": "Research",
+   "employmentType": "FullTime",
+   "location": "London",
+   "shouldDisplayCompensationOnJobPostings": false,
+   "secondaryLocations": [],
+   "publishedAt": "2026-04-17T00:52:06.526+00:00",
+   "isListed": true,
+   "isRemote": true,
+   "workplaceType": "Hybrid",
+   "address": {
+    "postalAddress": {
+     "addressRegion": "England",
+     "addressCountry": "United Kingdom",
+     "addressLocality": "London"
+    }
+   },
+   "jobUrl": "https://jobs.ashbyhq.com/voleon/f9de4f71-c0f8-4de4-8f88-0ee8072d1e7a",
+   "applyUrl": "https://jobs.ashbyhq.com/voleon/f9de4f71-c0f8-4de4-8f88-0ee8072d1e7a/application",
+   "descriptionPlain": "Voleon is a technology company that applies state-of-the-art AI and machine learning techniques to real-world problems in finance. For nearly two decades, we have led our industry and worked at the frontier of applying AI/ML to investment management. We have become a multibillion-dollar asset manager, and we have ambitious goals for the future.\n \nYour colleagues will include internationally recognized experts in artificial intelligence and machine learning research as well as highly experienced finance and technology professionals. In addition to our enriching and collegial working environment, we offer highly competitive compensation and benefits packages, technology talks by our experts, a beautiful modern office, daily catered lunches, and more.\n\n \n\nAs a Senior Member of Research Staff, you will work at the forefront of modern statistical machine learning leading key projects focused on enduring challenges of financial market prediction and portfolio optimization. Your research colleagues have collectively published hundreds of academic articles in top-tier venues on machine learning, systems, and theory, and we meet regularly to stay current on the latest academic research and share ideas. Founded by two leading scientists Voleon supports a culture of curiosity and creativity. We do not silo our teams, and you will enjoy a healthy work-life balance while tackling hard problems.\n\n \n\nThe behavior of financial markets is noisy and violates a number of classical statistical assumptions, and we’ve spent over a decade pioneering scientific advances in the application of machine learning techniques to this domain. Your team will work with a complex and diverse array of datasets to implement and rapidly iterate on predictive models. Despite the complexity of these problems, market returns provide immediate and unambiguous outcome data for measuring success.    \n\n \n\nYour team won’t just conduct research, they’ll apply it on a daily basis across the entire life cycle of a",
+   "compensation": {
+    "compensationTierSummary": null,
+    "scrapeableCompensationSalarySummary": null,
+    "compensationTiers": [],
+    "summaryComponents": []
+   }
+  },
+  {
+   "id": "5c966855-af8b-4bf5-9f58-6701e1cc2238",
+   "title": "Data Scientist (London)",
+   "department": "Research",
+   "team": "Research",
+   "employmentType": "FullTime",
+   "location": "London",
+   "shouldDisplayCompensationOnJobPostings": true,
+   "secondaryLocations": [],
+   "publishedAt": "2026-04-14T17:53:59.200+00:00",
+   "isListed": true,
+   "isRemote": true,
+   "workplaceType": "Hybrid",
+   "address": {
+    "postalAddress": {
+     "addressRegion": "England",
+     "addressCountry": "United Kingdom",
+     "addressLocality": "London"
+    }
+   },
+   "jobUrl": "https://jobs.ashbyhq.com/voleon/5c966855-af8b-4bf5-9f58-6701e1cc2238",
+   "applyUrl": "https://jobs.ashbyhq.com/voleon/5c966855-af8b-4bf5-9f58-6701e1cc2238/application",
+   "descriptionPlain": "Voleon is a technology company that applies state-of-the-art AI and machine learning techniques to real-world problems in finance. For nearly two decades, we have led our industry and worked at the frontier of applying AI/ML to investment management. We have become a multibillion-dollar asset manager, and we have ambitious goals for the future.\n\n\n\nYour colleagues will include internationally recognized experts in artificial intelligence and machine learning research as well as highly experienced finance and technology professionals. In addition to our enriching and collegial working environment, we offer highly competitive compensation and benefits packages, technology talks by our experts, a beautiful modern office, daily catered lunches, and more.\n\n\n\nAs a Data Scientist, you will be responsible for finding insights from a complex array of data. Your role will involve data curation, analysis, interpretation, visualization, and communication of your findings to members of the research staff and leadership. This role is a means to make a difference: as a machine learning company, data insights are essential to our business.\n\n\n\n\nRESPONSIBILITIES\n\n - Design and implement systems to ensure data correctness and monitor data health in data stores and live feeds\n\n - Proactively identify abnormal production behavior and communicate them clearly to relevant stakeholders\n\n - Perform extemporaneous analyses on research and production trading systems with leadership\n\n - Perform statistical analyses on production trading data and research data to inform further projects\n\n - Design and implement analysis pipelines that automate those analyses found to be valuable for ongoing monitoring\n\n\n\n\nREQUIREMENTS\n\n - 1+ years of applied end-to-end industry experience, including internships working with complex datasets, including curation, querying, aggregation, exploratory data analysis, and visualization\n\n - Experience using statistical methods to analyze data, identify patterns, conduct ",
+   "compensation": {
+    "compensationTierSummary": null,
+    "scrapeableCompensationSalarySummary": null,
+    "compensationTiers": [],
+    "summaryComponents": []
+   }
+  },
+  {
+   "id": "702c3699-5175-4e7b-af1c-447068ca365b",
+   "title": "Senior Manager, Learning and Development",
+   "department": "People Operations",
+   "team": "People Operations",
+   "employmentType": "FullTime",
+   "location": "Berkeley, CA",
+   "shouldDisplayCompensationOnJobPostings": true,
+   "secondaryLocations": [],
+   "publishedAt": "2026-10-12T20:10:40.720+00:00",
+   "isListed": true,
+   "isRemote": true,
+   "workplaceType": "Hybrid",
+   "address": {
+    "postalAddress": {
+     "addressRegion": "California",
+     "addressCountry": "United States",
+     "addressLocality": "Berkeley"
+    }
+   },
+   "jobUrl": "https://jobs.ashbyhq.com/voleon/702c3699-5175-4e7b-af1c-447068ca365b",
+   "applyUrl": "https://jobs.ashbyhq.com/voleon/702c3699-5175-4e7b-af1c-447068ca365b/application",
+   "descriptionPlain": "Voleon is a technology company that applies state-of-the-art AI and machine learning techniques to real-world problems in finance. For nearly two decades, we have led our industry and worked at the frontier of applying AI/ML to investment management. We have become a multibillion-dollar asset manager, and we have ambitious goals for the future.\n\n\n\nYour colleagues will include internationally recognized experts in artificial intelligence and machine learning research as well as highly experienced finance and technology professionals. The people who shape our company come from other backgrounds, including concert music performances, humanitarian aid, opera singing, sports writing, and BMX racing. You will be part of a team that loves to succeed together.\n\n\n\nIn addition to our enriching and collegial working environment, we offer highly competitive compensation and benefits packages, technology talks by our experts, a beautiful modern office, daily catered lunches, and more.\n\n\n\nAs the Senior Manager, Learning & Development, you will report directly to the Head of People. You will take ownership of designing, building, and delivering Voleon University, our comprehensive learning and development program spanning new hire onboarding, manager training, and work optimization for employees across the company. Operating as an individual contributor with significant autonomy, you will collaborate closely with the Head of People, People Business Partners, and subject matter experts across Research, Engineering, and all business functions to ensure content is relevant and aligned with our talent strategy. The purpose of this role is to build and deploy a scalable learning framework that accelerates every Voleon employee's ramp time, strengthens leadership capabilities, and enables everyone to do their best work as the company scales.\n\n\n\n\nRESPONSIBILITIES \n\n - Design, build, and own the curriculum and roadmap for Voleon University, a comprehensive learning and development program",
+   "compensation": {
+    "compensationTierSummary": "$170K – $200K • Offers Bonus",
+    "scrapeableCompensationSalarySummary": "$170K - $200K",
+    "compensationTiers": [
+     {
+      "id": "cbc8fd35-0585-4340-a83e-0f74a17921f5",
+      "tierSummary": "$170K – $200K • Offers Bonus",
+      "title": null,
+      "additionalInformation": null,
+      "components": [
+       {
+        "id": "d90b0651-b62f-4bca-98ec-f99e54dcf988",
+        "summary": "$170K – $200K",
+        "compensationType": "Salary",
+        "interval": "1 YEAR",
+        "currencyCode": "USD",
+        "minValue": 170000,
+        "maxValue": 200000
+       },
+       {
+        "id": "439aa022-37d8-4b8e-ac1a-a1d4a54286cd",
+        "summary": "Offers Bonus",
+        "compensationType": "Bonus",
+        "interval": "1 YEAR",
+        "currencyCode": "USD",
+        "minValue": null,
+        "maxValue": null
+       }
+      ]
+     }
+    ],
+    "summaryComponents": [
+     {
+      "compensationType": "Salary",
+      "interval": "1 YEAR",
+      "currencyCode": "USD",
+      "minValue": 170000,
+      "maxValue": 200000
+     },
+     {
+      "compensationType": "Bonus",
+      "interval": "1 YEAR",
+      "currencyCode": "USD",
+      "minValue": null,
+      "maxValue": null
+     }
+    ]
+   }
+  }
+ ]
+}

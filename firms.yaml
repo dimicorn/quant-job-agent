@@ -1,0 +1,81 @@
+# Watchlist фирм. Каждая доска проверена на публичном API ATS (ноябрь 2026): токен отвечает,
+# название фирмы в ответе совпадает. Проверить заново — uv run quant-agent firms --validate.
+#
+# Поля:
+#   ats    — greenhouse | lever | ashby | site (свой сайт фирмы: откликаться вручную)
+#   token  — имя доски в API (boards-api.greenhouse.io/v1/boards/<token>, api.lever.co/v0/postings/<token>,
+#            api.ashbyhq.com/posting-api/job-board/<token>); для site — адрес страницы карьеры
+#   links  — site: регулярка путей страниц вакансий; пусто — вся страница карьеры одной записью (следим за изменениями)
+#   kinds  — какие вакансии брать у этой фирмы вместо filters.kinds (internship | graduate | full_time)
+#   tier   — 1 — в первую очередь, 3 — запасные (порядок в review)
+#   max_applications — сколько заявок в фирму за cooldown_months (многие фирмы видят все заявки кандидата)
+#   season — месяцы, когда фирма обычно открывает набор стажёров/выпускников (для напоминаний)
+#
+# Не нашлись на Greenhouse/Lever/Ashby под очевидными токенами (скорее всего, свой сайт или Workday):
+# Citadel / Citadel Securities, SIG (Susquehanna), G-Research, Millennium, Two Sigma, D. E. Shaw.
+# Их подключим вместе с Workday и своими сайтами фирм.
+
+defaults:
+  max_applications: 2
+  cooldown_months: 6
+  season: [8, 9, 10, 11]
+
+firms:
+  # ── HFT и маркет-мейкеры ──
+  - {name: Jane Street, ats: greenhouse, token: janestreet, tier: 1}
+  - {name: Hudson River Trading, ats: greenhouse, token: wehrtyou, tier: 1}
+  - {name: Jump Trading, ats: greenhouse, token: jumptrading, tier: 1}
+  - {name: XTX Markets, ats: greenhouse, token: xtxmarketstechnologies, tier: 1, kinds: [internship, graduate, full_time]}
+  - {name: Optiver, ats: greenhouse, token: optiverus, tier: 1}
+  - {name: IMC, ats: greenhouse, token: imc, tier: 1}
+  - {name: DRW, ats: greenhouse, token: drweng, tier: 1}
+  - {name: Tower Research Capital, ats: greenhouse, token: towerresearchcapital, tier: 1}
+  - {name: Five Rings, ats: greenhouse, token: fiveringsllc, tier: 1}
+  - {name: Flow Traders, ats: greenhouse, token: flowtraders, tier: 2}
+  - {name: Virtu Financial, ats: greenhouse, token: virtu, tier: 2}
+  - {name: DV Trading, ats: greenhouse, token: dvtrading, tier: 2}
+  - {name: Mako, ats: greenhouse, token: mako, tier: 2}
+  - {name: Geneva Trading, ats: greenhouse, token: genevatrading, tier: 3}
+
+  # ── Квант-фонды ──
+  - {name: Qube Research & Technologies, ats: greenhouse, token: quberesearchandtechnologies, tier: 1}
+  - {name: Squarepoint Capital, ats: greenhouse, token: squarepointcapital, tier: 1}
+  - {name: Quadrature, ats: ashby, token: quadrature, tier: 1}
+  - {name: Aquatic Capital Management, ats: greenhouse, token: aquaticcapitalmanagement, tier: 2}
+  - {name: Voleon, ats: ashby, token: voleon, tier: 2}
+  - {name: Winton, ats: greenhouse, token: winton, tier: 2}
+  - {name: Man Group, ats: greenhouse, token: mangroup, tier: 3}
+
+  # ── Крипто-маркет-мейкеры ──
+  - {name: Keyrock, ats: ashby, token: keyrock, tier: 3}
+  - {name: Flowdesk, ats: greenhouse, token: flowdesk, tier: 3}
+  - {name: B2C2, ats: greenhouse, token: b2c2, tier: 3}
+
+  # ── Русскоязычные команды: реально попасть из РФ, много выпускников ШАДа и МФТИ ──
+  # Берём и обычные junior-позиции, не только стажировки (kinds).
+  - {name: Pinely, ats: ashby, token: pinely, tier: 1, kinds: [internship, graduate, full_time]}
+  - {name: Teza Technologies, ats: ashby, token: teza-technologies, tier: 1, kinds: [internship, graduate, full_time]}
+  - {name: Alber Blanc, ats: site, token: "https://alberblanc.com/careers/", links: "^/careers/[^/]+/?$", tier: 1,
+     kinds: [internship, graduate, full_time]}
+  - {name: Wunder Fund, ats: site, token: "https://wunderfund.io/", links: "^/jobs/[^/]+", tier: 1,
+     kinds: [internship, graduate, full_time]}
+  - {name: Eqvilent, ats: greenhouse, token: eqvilentjobs, tier: 1, kinds: [internship, graduate, full_time]}
+  - {name: QST, ats: site, token: "https://qstfin.com/", links: "^/careers/[^/]+", tier: 2,
+     kinds: [internship, graduate, full_time]}
+  - {name: Quantum Brains, ats: site, token: "https://quantumbrains.com/careers", tier: 2,
+     kinds: [internship, graduate, full_time]}
+  # SPECTRAL::Technologies: вакансии — страницы на assets.codeforces.com, подача — форма Codeforces или резюме
+  # в Telegram @valeria_spectral. Следим за изменениями страниц.
+  - {name: Spectral Junior, ats: site, token: "https://assets.codeforces.com/spectraltech/junior/", tier: 1,
+     kinds: [internship, graduate, full_time]}
+  - {name: Spectral Middle, ats: site, token: "https://assets.codeforces.com/spectraltech/middle/", tier: 2,
+     kinds: [internship, graduate, full_time]}
+  # Fast Forward (крипто-маркет-мейкер, Москва / удалёнка) публикует вакансии только на getmatch.ru — пока не подключён.
+  # Citadel / Citadel Securities — свой сайт на Workday, пока не подключены.
+
+  # ── Найдены на Lever / Ashby (ноябрь 2026) ──
+  - {name: Wintermute, ats: lever, token: wintermute-trading, tier: 2}
+  - {name: Wincent, ats: ashby, token: wincent, tier: 2, kinds: [internship, graduate, full_time]}
+  - {name: Belvedere Trading, ats: lever, token: belvederetrading, tier: 3}
+  - {name: Ansatz Capital, ats: lever, token: ansatzcapital, tier: 3}
+  - {name: Amber Group, ats: lever, token: ambergroup, tier: 3}

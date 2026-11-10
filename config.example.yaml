@@ -1,0 +1,114 @@
+# Скопируйте в config.yaml и подставьте свои значения. Тесты загружают этот файл как конфиг,
+# поэтому каждая новая настройка добавляется сюда с комментарием.
+
+# ── Аналитик (LLM) ────────────────────────────────────────────────────
+analyst:
+  backend: codex                     # codex — Codex CLI; claude_code — `claude -p`; api — Claude API (ANTHROPIC_API_KEY);
+                                     # openai — любой OpenAI-совместимый API; command — своя программа (stdin → JSON)
+  model: claude-opus-5-5             # модель для claude_code / api / openai
+  effort: medium                     # low | medium | high
+  base_url: null                     # openai: адрес API
+  api_key_env: OPENAI_API_KEY        # openai: переменная с ключом (или строка ИМЯ=ключ в .env)
+  openai_extra: {}                   # openai: доп. поля запроса
+  command: null                      # command: программа, которая читает запрос из stdin и печатает JSON
+  fallback_backend: null             # кончились лимиты основного — запросы идут сюда; null — остановиться
+  fallback_settings: {}              # свои поля для запасного, например {"model": "claude-opus-5-5"}
+  codex_model: null                  # null — модель Codex по умолчанию
+  codex_effort: null                 # low | medium | high | xhigh | max; null — по умолчанию модели
+  batch_size: 6                      # вакансий на один вызов оценки
+  parallel: 3                        # одновременных запросов к LLM
+  min_score: 70                      # в review и уведомления — вакансии с баллом не ниже
+  resume_file: resume_en.md          # резюме, по которому LLM оценивает вакансии
+  preferences: |
+    Цель — стажировки и graduate-позиции в HFT, у маркет-мейкеров и в квант-фондах Европы и UK.
+    Треки: quant researcher (ML на рыночных данных), quant developer (C++ low-latency),
+    ML-инфраструктура и данные в трейдинге. Не интересны: продажи, чистый трейдинг без кода, HR.
+
+# ── Локальные фильтры (до LLM, бесплатно) ─────────────────────────────
+filters:
+  kinds: [graduate, internship]      # internship | graduate | full_time — какие вакансии оценивать
+  locations: [London, Amsterdam, Dublin, Paris, Zug, Zurich, Geneva, Limassol, Cyprus, Dubai, Frankfurt,
+              Milan, Madrid, Barcelona, Warsaw, Remote, Europe, "United Kingdom", Netherlands, Ireland,
+              Switzerland, Belgrade, Yerevan, Almaty, Astana, Tbilisi, Brussels]   # подстрокой; [] — любые
+  title_include_any: []              # если не пусто — в названии должно быть хотя бы одно слово
+  title_exclude: [recruiter, "talent partner", recruitment, sales, legal, compliance, accountant,
+                  "executive assistant", "office manager", "human resources", payroll]
+
+# ── Условия допуска ───────────────────────────────────────────────────
+# Проверяются по тексту вакансии без LLM (явные формулировки) и ещё раз LLM при оценке.
+# Не подходите — статус ineligible с причиной: попытку в фирму не тратим.
+eligibility:
+  enrolled: false                    # учитесь ли сейчас в вузе (стажировки «for current students» отсекаются)
+  graduation_year: 2026              # год выпуска: «graduating in 2027–2028» при 2026 — ineligible
+  needs_sponsorship: true            # нужна рабочая виза в UK/EU: «no visa sponsorship» — ineligible
+  current_location: ""               # где вы живёте сейчас. Агент указывает только это место и ничего не выдумывает
+  citizenship: []                    # гражданство
+  work_authorization: []             # страны, где можно работать без визы
+  restricted_countries: []           # вакансия явно не рассматривает кандидатов из этих стран — ineligible
+  note: ""                           # свободный текст для LLM, например «поступаю в аспирантуру в 2027»
+
+facts: |
+  # Факты, которых нет в резюме: срок выхода, языки, ожидания по деньгам и т.п.
+
+# ── Слежение за досками ───────────────────────────────────────────────
+watch:
+  every_minutes: 90                  # стажировки раздают по мере поступления заявок — опрашивать часто
+  notify: true                       # уведомление macOS о новой вакансии с баллом ≥ analyst.min_score
+  workers: 6                         # параллельных запросов к доскам
+  # Списки SimplifyJobs на GitHub (listings.json, категория Quant): стажировки и вакансии для выпускников
+  # из сотен фирм, в том числе тех, что не в firms.yaml (Workday, iCIMS — откликаться вручную). [] — выключить.
+  aggregators:
+    - https://raw.githubusercontent.com/SimplifyJobs/Summer2027-Internships/dev/.github/scripts/listings.json
+    - https://raw.githubusercontent.com/SimplifyJobs/New-Grad-Positions/dev/.github/scripts/listings.json
+  aggregator_details: 30             # сколько новых вакансий из списков дочитывать за опрос
+
+# ── Профиль для форм заявки ───────────────────────────────────────────
+# Стандартные поля формы (имя, контакты, образование). Только правда: агент подставляет как есть.
+profile:
+  first_name: ""
+  last_name: ""
+  email: ""
+  phone: ""                          # международный формат: +7 926 …
+  country: ""                        # страна проживания, как в списке формы: Russia, Kazakhstan…
+  city: ""                           # город, как в подсказке поля Location: "Moscow, Moscow City, Russia"
+  linkedin: ""
+  github: ""
+  website: ""
+  education: []                      # блок образования Greenhouse; названия — как в его справочниках:
+  #  - school: "Moscow Institute of Physics and Technology"
+  #    school_aliases: ["Moscow Institute of Physics and Technology State University"]  # справочники у фирм разные
+  #    degree_aliases: ["Master", "Master's"]            # в других формах степень называется короче
+  #    degree: "Master's Degree"     # Bachelor's Degree | Master's Degree | Doctor of Philosophy (Ph.D.) | Other
+  #    discipline: "Computer Science"
+  #    start: [9, 2024]              # [месяц, год]
+  #    end: [6, 2026]
+
+# ── Заявки через формы ATS (apply / autopilot) ───────────────────────
+apply:
+  mode: assist                       # assist — агент заполняет форму, Submit жмёте вы; auto — агент сам;
+                                     # dry_run — заполнить и снять скриншот, ничего не отправлять
+  daily_limit: 5                     # заявок в сутки: у фирм мало попыток на кандидата
+  max_per_run: 5
+  min_score: 80                      # автопилот подаёт только на вакансии с баллом не ниже
+  auto_consent: true                 # вопрос с единственным вариантом («I acknowledge…») — выбрать его
+  answers_file: answers.yaml         # ваши ответы на вопросы анкет; пополняется командой answers
+  profile_dir: .browser-profile
+  headless: false
+  submit_wait_minutes: 20            # assist: сколько ждать, пока вы нажмёте Submit
+  active_hours: [8, 23]
+  weekdays_only: false
+  read_seconds: [8, 20]              # паузы — как в hh-agent: «читаем» вакансию,
+  action_seconds: [0.8, 2.5]         #   пауза между полями,
+  typing_delay_ms: [30, 90]          #   печать посимвольно ([0, 0] — вставлять целиком),
+  delay_seconds: [90, 240]           #   пауза между заявками
+  max_consecutive_errors: 3
+
+# PDF резюме, который загружать в форму, по треку вакансии: qr — quant research, qd — quant dev / C++,
+# infra — ML-инфраструктура, other — остальное. {} — materials/resume.pdf (uv run quant-agent pdf).
+resume_pdfs: {}
+
+hh_agent_dir: ""                     # папка hh-agent (например ../hh-agent): его questions.facts и faq.yaml —
+                                     # дополнительные факты для оценки и ответов на анкеты; "" — не подключать
+
+firms_file: firms.yaml               # watchlist фирм
+db_path: quant_agent.db

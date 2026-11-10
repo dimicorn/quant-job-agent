@@ -1,0 +1,773 @@
+{
+ "id": 8585609002,
+ "title": "Graduate Quantitative Researcher (2027 Start)",
+ "absolute_url": "https://www.optiver.com/join-us/jobs/8585609002/?gh_jid=8585609002",
+ "questions": [
+  {
+   "description": null,
+   "label": "First Name",
+   "required": true,
+   "fields": [
+    {
+     "name": "first_name",
+     "type": "input_text",
+     "values": []
+    }
+   ]
+  },
+  {
+   "description": null,
+   "label": "Last Name",
+   "required": true,
+   "fields": [
+    {
+     "name": "last_name",
+     "type": "input_text",
+     "values": []
+    }
+   ]
+  },
+  {
+   "description": null,
+   "label": "Email",
+   "required": true,
+   "fields": [
+    {
+     "name": "email",
+     "type": "input_text",
+     "values": []
+    }
+   ]
+  },
+  {
+   "description": null,
+   "label": "Phone",
+   "required": true,
+   "fields": [
+    {
+     "name": "phone",
+     "type": "input_text",
+     "values": []
+    }
+   ]
+  },
+  {
+   "description": null,
+   "label": "Resume/CV",
+   "required": true,
+   "fields": [
+    {
+     "name": "resume",
+     "type": "input_file",
+     "values": []
+    },
+    {
+     "name": "resume_text",
+     "type": "textarea",
+     "values": []
+    }
+   ]
+  },
+  {
+   "description": null,
+   "label": "In the past 8 months, have you applied to and completed an assessment, or interviewed for a quants role (full-time, internship, or early career program) at any Optiver location?",
+   "required": true,
+   "fields": [
+    {
+     "name": "question_36875673002",
+     "type": "multi_value_single_select",
+     "values": [
+      {
+       "label": "Yes",
+       "value": 1
+      },
+      {
+       "label": "No",
+       "value": 0
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "description": "<p><!--StartFragment--><strong data-stringify-type=\"bold\"><em data-stringify-type=\"italic\">Example:</em></strong><em data-stringify-type=\"italic\"> You are due to graduate from your Bachelor's degree in June 2025, but you are also planning to undertake a Master's/PhD which will conclude in September 2027. Your graduation time frame would be November 2026 - October 2027.</em><!--EndFragment--></p>",
+   "label": "Please re-confirm your expected university graduation time frame including any anticipated, but not yet commenced studies (even if you are still in the process of applying or awaiting confirmation). This should be the final month and year of your studies, not the month and year of your graduation ceremony.",
+   "required": true,
+   "fields": [
+    {
+     "name": "question_36875674002",
+     "type": "multi_value_single_select",
+     "values": [
+      {
+       "label": "Before September 2023",
+       "value": 244072272002
+      },
+      {
+       "label": "October 2023 - October 2027",
+       "value": 244072273002
+      },
+      {
+       "label": "November 2027 - October 2028",
+       "value": 243861064002
+      },
+      {
+       "label": "November 2028 - October 2029",
+       "value": 244072274002
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "description": null,
+   "label": "Please confirm the region you are currently situated and studying in",
+   "required": true,
+   "fields": [
+    {
+     "name": "question_36875675002",
+     "type": "multi_value_single_select",
+     "values": [
+      {
+       "label": "UK",
+       "value": 243861065002
+      },
+      {
+       "label": "Europe",
+       "value": 243861066002
+      },
+      {
+       "label": "Middle East",
+       "value": 243861067002
+      },
+      {
+       "label": "India",
+       "value": 243861068002
+      },
+      {
+       "label": "Africa",
+       "value": 243861069002
+      },
+      {
+       "label": "North America",
+       "value": 243861070002
+      },
+      {
+       "label": "South America",
+       "value": 243861071002
+      },
+      {
+       "label": "East and South East Asia",
+       "value": 243861072002
+      },
+      {
+       "label": "Oceania",
+       "value": 243861073002
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "description": null,
+   "label": "Please re-confirm the university you currently attend",
+   "required": true,
+   "fields": [
+    {
+     "name": "question_36875676002",
+     "type": "multi_value_single_select",
+     "values": [
+      {
+       "label": "University of Oxford",
+       "value": 243861074002
+      },
+      {
+       "label": "University of Cambridge",
+       "value": 243861075002
+      },
+      {
+       "label": "University of Warwick",
+       "value": 243861076002
+      },
+      {
+       "label": "Imperial College London",
+       "value": 243861077002
+      },
+      {
+       "label": "London School of Economics (LSE)",
+       "value": 243861078002
+      },
+      {
+       "label": "University of Edinburgh",
+       "value": 243861079002
+      },
+      {
+       "label": "Trinity College Dublin",
+       "value": 243861080002
+      },
+      {
+       "label": "Vrije University Amsterdam (VU)",
+       "value": 243861081002
+      },
+      {
+       "label": "University of Amsterdam (UvA)",
+       "value": 243861082002
+      },
+      {
+       "label": "Delft University of Technology",
+       "value": 243861083002
+      },
+      {
+       "label": "Other",
+       "value": 243861108002
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "description": "<p><!--StartFragment-->If you have multiple disciplines, please select all that apply.<!--EndFragment--></p>",
+   "label": "Please confirm your undergraduate discipline(s).",
+   "required": true,
+   "fields": [
+    {
+     "name": "question_36875677002[]",
+     "type": "multi_value_multi_select",
+     "values": [
+      {
+       "label": "Accounting",
+       "value": 243861109002
+      },
+      {
+       "label": "Actuarial Science",
+       "value": 243861110002
+      },
+      {
+       "label": "Aerospace Engineering",
+       "value": 243861111002
+      },
+      {
+       "label": "African Studies",
+       "value": 243861112002
+      },
+      {
+       "label": "Agriculture",
+       "value": 243861113002
+      },
+      {
+       "label": "Anthropology",
+       "value": 243861114002
+      },
+      {
+       "label": "Architecture",
+       "value": 243861115002
+      },
+      {
+       "label": "Art",
+       "value": 243861116002
+      },
+      {
+       "label": "Asian Studies",
+       "value": 243861117002
+      },
+      {
+       "label": "Astronomy",
+       "value": 243861118002
+      },
+      {
+       "label": "Computer Science",
+       "value": 243861132002
+      },
+      {
+       "label": "Mathematics",
+       "value": 243861179002
+      },
+      {
+       "label": "Other",
+       "value": 243861190002
+      },
+      {
+       "label": "Physics",
+       "value": 243861194002
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "description": "<p><!--StartFragment-->Please choose the classification that best reflects your academic performance rating for your degree.<!--EndFragment--></p>",
+   "label": "What is your undergraduate academic performance rating?",
+   "required": true,
+   "fields": [
+    {
+     "name": "question_36875678002",
+     "type": "multi_value_single_select",
+     "values": [
+      {
+       "label": "90-100% | 9.0-10.0 GPA | First Class",
+       "value": 243861213002
+      },
+      {
+       "label": "80-89% | 8.0-8.9 GPA | First Class",
+       "value": 243861214002
+      },
+      {
+       "label": "70-79% | 7.0-7.9 GPA | First Class",
+       "value": 243861215002
+      },
+      {
+       "label": "60-69% | 6.0-6.9 GPA | Upper Second Class",
+       "value": 243861216002
+      },
+      {
+       "label": "50-59% | 5.0-5.9 GPA | Lower Second Class",
+       "value": 243861217002
+      },
+      {
+       "label": "40-49% | 4.0-4.9 GPA | Third Class",
+       "value": 243861218002
+      },
+      {
+       "label": "30-39% | 3.0-3.9 GPA | Fail",
+       "value": 243861219002
+      },
+      {
+       "label": "20-29% | 2.0-2.9 GPA | Fail",
+       "value": 243861220002
+      },
+      {
+       "label": "10-19% | 1.0-1.9 GPA | Fail",
+       "value": 243861221002
+      },
+      {
+       "label": "0-9% | 0.0-0.9 GPA | Fail",
+       "value": 243861222002
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "description": "<p><!--StartFragment-->If you have multiple disciplines, please select all that apply.<!--EndFragment--></p>",
+   "label": "Please confirm your postgraduate discipline(s)",
+   "required": false,
+   "fields": [
+    {
+     "name": "question_36875679002[]",
+     "type": "multi_value_multi_select",
+     "values": [
+      {
+       "label": "Accounting",
+       "value": 243861223002
+      },
+      {
+       "label": "Actuarial Science",
+       "value": 243861224002
+      },
+      {
+       "label": "Aerospace Engineering",
+       "value": 243861225002
+      },
+      {
+       "label": "African Studies",
+       "value": 243861226002
+      },
+      {
+       "label": "Agriculture",
+       "value": 243861227002
+      },
+      {
+       "label": "Anthropology",
+       "value": 243861228002
+      },
+      {
+       "label": "Architecture",
+       "value": 243861229002
+      },
+      {
+       "label": "Art",
+       "value": 243861230002
+      },
+      {
+       "label": "Asian Studies",
+       "value": 243861231002
+      },
+      {
+       "label": "Astronomy",
+       "value": 243861232002
+      },
+      {
+       "label": "Computer Science",
+       "value": 243861246002
+      },
+      {
+       "label": "Mathematics",
+       "value": 243861293002
+      },
+      {
+       "label": "Other",
+       "value": 243861304002
+      },
+      {
+       "label": "Physics",
+       "value": 243861308002
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "description": "<p><!--StartFragment-->Please choose the classification that best reflects your academic performance rating for your degree.<!--EndFragment--></p>",
+   "label": "What is your postgraduate academic performance rating?",
+   "required": false,
+   "fields": [
+    {
+     "name": "question_36875680002",
+     "type": "multi_value_single_select",
+     "values": [
+      {
+       "label": "90-100% | 9.0-10.0 GPA | First Class",
+       "value": 243861327002
+      },
+      {
+       "label": "80-89% | 8.0-8.9 GPA | First Class",
+       "value": 243861328002
+      },
+      {
+       "label": "70-79% | 7.0-7.9 GPA | First Class",
+       "value": 243861329002
+      },
+      {
+       "label": "60-69% | 6.0-6.9 GPA | Lower Second Class",
+       "value": 243861330002
+      },
+      {
+       "label": "50-59% | 5.0-5.9 GPA | Third Class",
+       "value": 243861331002
+      },
+      {
+       "label": "40-49% | 4.0-4.9 GPA | Fail",
+       "value": 243861332002
+      },
+      {
+       "label": "30-39% | 3.0-3.9 GPA | Fail",
+       "value": 243861333002
+      },
+      {
+       "label": "20-29% | 2.0-2.9 GPA | Fail",
+       "value": 243861334002
+      },
+      {
+       "label": "10-19% | 1.0-1.9 GPA | Fail",
+       "value": 243861335002
+      },
+      {
+       "label": "0-9% | 0.0-0.9 GPA | Fail",
+       "value": 243861336002
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "description": null,
+   "label": "How did you hear about Optiver? ",
+   "required": true,
+   "fields": [
+    {
+     "name": "question_36875681002",
+     "type": "multi_value_single_select",
+     "values": [
+      {
+       "label": "Bright Network",
+       "value": 243861337002
+      },
+      {
+       "label": "Career Fair",
+       "value": 243861338002
+      },
+      {
+       "label": "Career Kickstarter",
+       "value": 243861339002
+      },
+      {
+       "label": "Career Services",
+       "value": 243861340002
+      },
+      {
+       "label": "Campus Event – other than Career Fair",
+       "value": 243861341002
+      },
+      {
+       "label": "Chess Championship",
+       "value": 243861342002
+      },
+      {
+       "label": "Kaggle Competition",
+       "value": 243861343002
+      },
+      {
+       "label": "Facebook",
+       "value": 243861344002
+      },
+      {
+       "label": "Friends",
+       "value": 243861345002
+      },
+      {
+       "label": "Grace Hopper",
+       "value": 243861346002
+      },
+      {
+       "label": "Other",
+       "value": 243861358002
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "description": null,
+   "label": "If other, please specify",
+   "required": false,
+   "fields": [
+    {
+     "name": "question_36875682002",
+     "type": "input_text",
+     "values": []
+    }
+   ]
+  },
+  {
+   "description": null,
+   "label": "Do you have any other offers we should be aware of as we process your application?",
+   "required": true,
+   "fields": [
+    {
+     "name": "question_37827178002",
+     "type": "multi_value_single_select",
+     "values": [
+      {
+       "label": "Yes",
+       "value": 1
+      },
+      {
+       "label": "No",
+       "value": 0
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "description": null,
+   "label": "If yes, please select the firm your offer is from:",
+   "required": false,
+   "fields": [
+    {
+     "name": "question_38230005002",
+     "type": "multi_value_single_select",
+     "values": [
+      {
+       "label": "Other",
+       "value": 253500150002
+      },
+      {
+       "label": "3Red Partners",
+       "value": 253500151002
+      },
+      {
+       "label": "Accenture",
+       "value": 253500152002
+      },
+      {
+       "label": "Adobe",
+       "value": 253500153002
+      },
+      {
+       "label": "Airbnb",
+       "value": 253500154002
+      },
+      {
+       "label": "Akuna Capital",
+       "value": 253500155002
+      },
+      {
+       "label": "Allston Trading",
+       "value": 253500156002
+      },
+      {
+       "label": "Amazon",
+       "value": 253500157002
+      },
+      {
+       "label": "Amazon Web Services",
+       "value": 253500158002
+      },
+      {
+       "label": "AMD",
+       "value": 253500159002
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "description": null,
+   "label": "If applicable, please share any relevant details, including any timelines you are working to.",
+   "required": false,
+   "fields": [
+    {
+     "name": "question_37827179002",
+     "type": "textarea",
+     "values": []
+    }
+   ]
+  },
+  {
+   "description": null,
+   "label": "What are your pronouns?",
+   "required": true,
+   "fields": [
+    {
+     "name": "question_36875683002",
+     "type": "multi_value_single_select",
+     "values": [
+      {
+       "label": "She/Her",
+       "value": 243861359002
+      },
+      {
+       "label": "He/Him",
+       "value": 243861360002
+      },
+      {
+       "label": "They/Them",
+       "value": 243861361002
+      },
+      {
+       "label": "Prefer not to say",
+       "value": 243861362002
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "description": null,
+   "label": "I acknowledge that by submitting my application I will be able to take the assessment within the given timeframe (7 calendar days).",
+   "required": true,
+   "fields": [
+    {
+     "name": "question_36875685002",
+     "type": "multi_value_single_select",
+     "values": [
+      {
+       "label": "Acknowledged",
+       "value": 243861365002
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "description": "<p><!--StartFragment--><em data-stringify-type=\"italic\">Please note, in the instance you are unsuccessful in your first choice, the eight month cooling off period may apply to other positions of a similar nature.</em><!--EndFragment--></p>",
+   "label": "We will only consider you for one role/location at a time. Therefore, if you are interested in multiple roles, please submit an application for your first preference only.",
+   "required": true,
+   "fields": [
+    {
+     "name": "question_36875686002",
+     "type": "multi_value_single_select",
+     "values": [
+      {
+       "label": "I am NOT currently in process for an Optiver role",
+       "value": 243861366002
+      },
+      {
+       "label": "I am currently in process for another Optiver role",
+       "value": 243861367002
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "description": null,
+   "label": "Which office location are you interested in? ",
+   "required": true,
+   "fields": [
+    {
+     "name": "question_36875687002",
+     "type": "multi_value_single_select",
+     "values": [
+      {
+       "label": "Amsterdam",
+       "value": 243861368002
+      },
+      {
+       "label": "London",
+       "value": 243861369002
+      },
+      {
+       "label": "Both",
+       "value": 243861370002
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "description": "<p><!--StartFragment--></p>\n<p>I confirm that I have read, understood and agree to Optiver's <a href=\"https://optiver.com/privacypolicy\" target=\"_blank\" rel=\"noopener\"><span style=\"text-decoration: underline;\">privacy policies, notices and disclaimers</span></a> (incorporating privacy notices) which sets out the ways in which Optiver may collect, use, disclose and hold my personal information.</p>\n<p><!--EndFragment--></p>",
+   "label": "Terms and Conditions",
+   "required": true,
+   "fields": [
+    {
+     "name": "question_36875688002",
+     "type": "multi_value_single_select",
+     "values": [
+      {
+       "label": "Yes, I have read and agree to Optiver’s privacy policies, notices and disclaimers.",
+       "value": 243861371002
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "description": null,
+   "label": "By submitting this application, you confirm and agree that you will complete any assessment for Optiver independently and without the use of AI tools, online resources, or assistance from others, unless stated otherwise. This application process and assessment are proctored and may include visual, audio, and on-device behaviour tracking. By clicking the box below, you consent to Optiver’s use of such proctoring. Shortlisted candidates may be required to complete any assessment again in person at the final stage. A breach of the foregoing may result in an immediate and indefinite ban from applying to any Optiver roles.",
+   "required": true,
+   "fields": [
+    {
+     "name": "question_37830418002",
+     "type": "multi_value_single_select",
+     "values": [
+      {
+       "label": "I consent to the above",
+       "value": 251579867002
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "description": null,
+   "label": "Please check & confirm all of the above information, including the spelling of personal details, is correct. We will not be able to reset accounts due to input errors.",
+   "required": true,
+   "fields": [
+    {
+     "name": "question_36875689002",
+     "type": "multi_value_single_select",
+     "values": [
+      {
+       "label": "I confirm the above information is correct",
+       "value": 243861372002
+      }
+     ]
+    }
+   ]
+  }
+ ],
+ "location_questions": [],
+ "compliance": null,
+ "demographic_questions": null
+}

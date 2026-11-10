@@ -1,0 +1,325 @@
+{
+ "jobs": [
+  {
+   "absolute_url": "https://www.optiver.com/join-us/jobs/8713775002/?gh_jid=8713775002",
+   "data_compliance": [
+    {
+     "type": "gdpr",
+     "requires_consent": false,
+     "requires_processing_consent": false,
+     "requires_retention_consent": false,
+     "retention_period": null,
+     "demographic_data_consent_applies": false
+    }
+   ],
+   "education": "education_required",
+   "internal_job_id": 6441857002,
+   "location": {
+    "name": "Amsterdam, North Holland, Netherlands"
+   },
+   "metadata": [
+    {
+     "id": 4258682002,
+     "name": "Workflow",
+     "value": "Campus",
+     "value_type": "single_select"
+    },
+    {
+     "id": 11001941002,
+     "name": "Website Level Mapping",
+     "value": "Internship",
+     "value_type": "single_select"
+    },
+    {
+     "id": 115810240002,
+     "name": "Global - Leadership Owner",
+     "value": {
+      "name": "Nicolle Chapman",
+      "email": "nicollechapman@optiver.com",
+      "user_id": 5051769002,
+      "employee_id": null
+     },
+     "value_type": "user"
+    },
+    {
+     "id": 116861118002,
+     "name": "Requisition Type",
+     "value": "Internship Requisition",
+     "value_type": "single_select"
+    }
+   ],
+   "id": 8713775002,
+   "updated_at": "2026-10-02T14:16:51-04:00",
+   "requisition_id": "2982",
+   "title": "FPGA Internship (2027 Start)",
+   "company_name": "Optiver ",
+   "first_published": "2026-08-17T07:19:48-04:00",
+   "language": "en",
+   "application_deadline": null,
+   "content": "&lt;p data-local-id=&quot;6618a4c09482&quot; data-prosemirror-content-type=&quot;node&quot; data-prosemirror-node-name=&quot;paragraph&quot; data-prosemirror-node-block=&quot;true&quot; data-pm-slice=&quot;1 1 []&quot;&gt;Optiver FPGA Engineers build hardware systems where nanoseconds matter. Their work spans highly parallel algorithms, low-level networking and latency-critical applications that operate in live markets. They work closely with traders, software engineers and researchers to understand how trading strategies behave in production, then turn that context into systems that are fast, reliable and efficient.&lt;/p&gt;\n&lt;p data-local-id=&quot;6618a4c09482&quot; data-prosemirror-content-type=&quot;node&quot; data-prosemirror-node-name=&quot;paragraph&quot; data-prosemirror-node-block=&quot;true&quot; data-pm-slice=&quot;1 1 []&quot;&gt;Optiver is building with cutting edge AI technology in the most competitive, data rich landscapes in the world: financial markets. That means no two days are the same, and every day brings new, exciting technical challenges to solve.&lt;/p&gt;\n&lt;p data-local-id=&quot;811aa0e82a36&quot; data-prosemirror-content-type=&quot;node&quot; data-prosemirror-node-name=&quot;paragraph&quot; data-prosemirror-node-block=&quot;true&quot;&gt;&amp;nbsp;&lt;/p&gt;\n&lt;p data-local-id=&quot;f3ca1cc28d29&quot; data-prosemirror-content-type=&quot;node&quot; data-prosemirror-node-name=&quot;paragraph&quot; data-prosemirror-node-block=&quot;true&quot;&gt;&lt;strong data-prosemirror-content-type=&quot;mark&quot; data-prosemirror-mark-name=&quot;strong&quot;&gt;What you’ll do&lt;/strong&gt;&lt;/p&gt;\n&lt;p data-local-id=&quot;87b6e816f97d&quot; data-prosemirror-content-type=&quot;node&quot; data-prosemirror-node-name=&quot;paragraph&quot; data-prosemirror-node-block=&quot;true&quot;&gt;Get ready for a ten-week internship where you’ll be immersed in the systems behind Optiver’s trading. As Optiver’s FPGA Engineer Intern, you’ll own a project connected to our live trading systems, experiencing tight feedback loops and shipping your code to production alongside our Engineers and Traders. You’ll work side-by-side with your mentor to build latency-critical applications, parallel systems and networking interfaces, giving you a clear view of how low-level engineering decisions connect to trading outcomes. You’ll tackle real issues that will test your critical thinking and problem-solving acumen, and each day will bring new challenges that require fresh perspectives. It’s an opportunity to accelerate your knowledge while contributing to systems that operate in live markets.&lt;/p&gt;\n&lt;p data-local-id=&quot;d0a338558929&quot; data-prosemirror-content-type=&quot;node&quot; data-prosemirror-node-name=&quot;paragraph&quot; data-prosemirror-node-block=&quot;true&quot;&gt;You will also have the chance to join industry lectures to learn about trading and our other departments to gain a complete understanding of Optiver and our business. Do",
+   "departments": [
+    {
+     "id": 4078829002,
+     "name": "Hardware",
+     "child_ids": [],
+     "parent_id": 4017842002
+    }
+   ],
+   "offices": [
+    {
+     "id": 4040190002,
+     "name": "Amsterdam",
+     "location": "Amsterdam, North Holland, Netherlands",
+     "child_ids": [],
+     "parent_id": 4040189002
+    }
+   ],
+   "ai_disclaimer": null,
+   "include_ai_disclaimer": null,
+   "ai_opt_out_request_url": null
+  },
+  {
+   "absolute_url": "https://www.optiver.com/join-us/jobs/8700160002/?gh_jid=8700160002",
+   "data_compliance": [
+    {
+     "type": "gdpr",
+     "requires_consent": false,
+     "requires_processing_consent": false,
+     "requires_retention_consent": false,
+     "retention_period": null,
+     "demographic_data_consent_applies": false
+    }
+   ],
+   "education": "education_required",
+   "internal_job_id": 6476583002,
+   "location": {
+    "name": "Amsterdam, North Holland, Netherlands"
+   },
+   "metadata": [
+    {
+     "id": 4258682002,
+     "name": "Workflow",
+     "value": "Campus",
+     "value_type": "single_select"
+    },
+    {
+     "id": 11001941002,
+     "name": "Website Level Mapping",
+     "value": "Graduate",
+     "value_type": "single_select"
+    },
+    {
+     "id": 115810240002,
+     "name": "Global - Leadership Owner",
+     "value": {
+      "name": "Nicolle Chapman",
+      "email": "nicollechapman@optiver.com",
+      "user_id": 5051769002,
+      "employee_id": null
+     },
+     "value_type": "user"
+    },
+    {
+     "id": 116861118002,
+     "name": "Requisition Type",
+     "value": "Headcount Requisition",
+     "value_type": "single_select"
+    }
+   ],
+   "id": 8700160002,
+   "updated_at": "2026-10-02T14:16:51-04:00",
+   "requisition_id": "3074",
+   "title": "Graduate Equity Analyst (2027 Start)",
+   "company_name": "Optiver ",
+   "first_published": "2026-08-17T07:15:03-04:00",
+   "language": "en",
+   "application_deadline": null,
+   "content": "&lt;p data-renderer-start-pos=&quot;18&quot; data-local-id=&quot;a3536f325169&quot;&gt;Optiver’s Equity Options Trading team is looking for Graduate Equity Analysts to help shape our fundamental research-driven trading.&lt;/p&gt;\n&lt;p data-renderer-start-pos=&quot;152&quot; data-local-id=&quot;db0ba8cc7931&quot;&gt;As an Equity Analyst at Optiver you will use current events and fundamental research to influence the team’s trading decisions. You will sit directly on the trading floor and work in close collaboration with Traders, Quantitative Researchers and Developers to creatively solve problems and identify new trading opportunities. You will also put on research-backed trades based on your own analysis, giving you direct ownership of your best ideas and rapid feedback from the market.&lt;/p&gt;\n&lt;p data-renderer-start-pos=&quot;634&quot; data-local-id=&quot;ea5b2490807b&quot;&gt;You will begin with structured training through the Optiver Academy for Equity Analysts. As your market knowledge and judgement develop, you will take increasing ownership of company coverage, research ideas and research-backed trading positions.&lt;/p&gt;\n&lt;p data-renderer-start-pos=&quot;882&quot; data-local-id=&quot;42b6dfb00cba&quot;&gt;&lt;strong data-renderer-mark=&quot;true&quot;&gt;What you’ll do&lt;/strong&gt;&lt;/p&gt;\n&lt;p data-renderer-start-pos=&quot;898&quot; data-local-id=&quot;33cea613784f&quot;&gt;In this role, you can expect to:&lt;/p&gt;\n&lt;ul&gt;\n&lt;li data-renderer-start-pos=&quot;934&quot; data-local-id=&quot;88f01e76d6cd&quot;&gt;Identify fundamentally driven trading opportunities and work with traders to capture them, focusing on maximising your impact on overall desk PnL.&lt;/li&gt;\n&lt;li data-renderer-start-pos=&quot;934&quot; data-local-id=&quot;88f01e76d6cd&quot;&gt;Think probabilistically and perform scenario analysis for relevant upcoming events and catalysts. Analyse time sensitive headlines for companies within your coverage sectors and assess their potential impact on volatility and/or stock prices.&lt;/li&gt;\n&lt;li data-renderer-start-pos=&quot;934&quot; data-local-id=&quot;88f01e76d6cd&quot;&gt;Assist in the growth of our fundamental research team by developing processes, identifying new areas of market inefficiencies and building relevant industry networks.&lt;/li&gt;\n&lt;li data-renderer-start-pos=&quot;934&quot; data-local-id=&quot;88f01e76d6cd&quot;&gt;Use AI-enabled tools, supported by training, to organise and analyse news, events and company information, applying your own judgement to validate their output and improve the research tooling.&lt;/li&gt;\n&lt;/ul&gt;\n&lt;p data-renderer-start-pos=&quot;1696&quot; data-local-id=&quot;9b9380fa8802&quot;&gt;&lt;strong data-renderer-mark=&quot;true&quot;&gt;What you’ll get&lt;/strong&gt;&lt;/p&gt;\n&lt;p data-renderer-start-pos=&quot;1713&quot; data-local-id=&quot;cfa6f76e629a&quot;&gt;You’ll join a culture of collaboration and excellence, where you’ll be surrounded by curious t",
+   "departments": [
+    {
+     "id": 4078834002,
+     "name": "Trading Analysts",
+     "child_ids": [],
+     "parent_id": 4067639002
+    }
+   ],
+   "offices": [
+    {
+     "id": 4040190002,
+     "name": "Amsterdam",
+     "location": "Amsterdam, North Holland, Netherlands",
+     "child_ids": [],
+     "parent_id": 4040189002
+    }
+   ],
+   "ai_disclaimer": null,
+   "include_ai_disclaimer": null,
+   "ai_opt_out_request_url": null
+  },
+  {
+   "absolute_url": "https://www.optiver.com/join-us/jobs/8313105002/?gh_jid=8313105002",
+   "data_compliance": [
+    {
+     "type": "gdpr",
+     "requires_consent": false,
+     "requires_processing_consent": false,
+     "requires_retention_consent": false,
+     "retention_period": null,
+     "demographic_data_consent_applies": false
+    }
+   ],
+   "education": "education_optional",
+   "internal_job_id": 6319605002,
+   "location": {
+    "name": "Amsterdam, North Holland, Netherlands"
+   },
+   "metadata": [
+    {
+     "id": 4258682002,
+     "name": "Workflow",
+     "value": "Experienced",
+     "value_type": "single_select"
+    },
+    {
+     "id": 11001941002,
+     "name": "Website Level Mapping",
+     "value": "Experienced",
+     "value_type": "single_select"
+    },
+    {
+     "id": 115810240002,
+     "name": "Global - Leadership Owner",
+     "value": {
+      "name": "Scott McKenzie",
+      "email": "scottmckenzie@optiver.us",
+      "user_id": 5037633002,
+      "employee_id": null
+     },
+     "value_type": "user"
+    },
+    {
+     "id": 116861118002,
+     "name": "Requisition Type",
+     "value": null,
+     "value_type": "single_select"
+    }
+   ],
+   "id": 8313105002,
+   "updated_at": "2026-10-02T14:16:51-04:00",
+   "requisition_id": "2518",
+   "title": "AI Engineer",
+   "company_name": "Optiver ",
+   "first_published": "2026-02-13T11:39:38-05:00",
+   "language": "en",
+   "application_deadline": null,
+   "content": "&lt;p&gt;&lt;strong&gt;WHAT YOU’LL DO&lt;/strong&gt;&lt;/p&gt;\n&lt;p&gt;We are seeking a highly skilled and experienced AI Engineer to join our dynamic team. In this hands-on role, you’ll design, build, and deploy sophisticated agents that orchestrate data, workflows, and decisions across the firm. You’ll own the full lifecycle—from rapid prototyping through production rollout—while always tying technical choices back to clear business outcomes. If you can translate strategy into code, measure impact in dollars (or hours saved), and thrive in a fast-moving environment, we want to meet you.&lt;/p&gt;\n&lt;p&gt;Key Responsibilities:&lt;/p&gt;\n&lt;ul data-indent-level=&quot;1&quot;&gt;\n&lt;li&gt;\n&lt;p data-renderer-start-pos=&quot;660&quot;&gt;Design and develop robust AI agents using Python&lt;/p&gt;\n&lt;/li&gt;\n&lt;li&gt;\n&lt;p data-renderer-start-pos=&quot;714&quot;&gt;Integrate AI solutions with existing enterprise systems&lt;/p&gt;\n&lt;/li&gt;\n&lt;li&gt;\n&lt;p data-renderer-start-pos=&quot;775&quot;&gt;Understand the landscape of 3rd party models, their strengths and weaknesses&lt;/p&gt;\n&lt;/li&gt;\n&lt;li&gt;\n&lt;p data-renderer-start-pos=&quot;857&quot;&gt;Collaborate with cross-functional teams to understand user needs and deliver effective agents&lt;/p&gt;\n&lt;/li&gt;\n&lt;li&gt;\n&lt;p data-renderer-start-pos=&quot;956&quot;&gt;Maintain a platform for the evaluation of agents&lt;/p&gt;\n&lt;/li&gt;\n&lt;li&gt;\n&lt;p data-renderer-start-pos=&quot;1010&quot;&gt;&lt;span data-renderer-mark=&quot;true&quot; data-text-custom-color=&quot;#36b37e&quot;&gt;Produce high-quality, unit-tested code and uphold consistent style and documentation through code reviews and CI/CD practices&lt;/span&gt;&lt;/p&gt;\n&lt;/li&gt;\n&lt;li&gt;\n&lt;p data-renderer-start-pos=&quot;1140&quot;&gt;Troubleshoot and debug AI systems to ensure optimal performance&lt;/p&gt;\n&lt;/li&gt;\n&lt;/ul&gt;\n&lt;p&gt;&lt;strong&gt;WHO YOU ARE&lt;/strong&gt;&lt;/p&gt;\n&lt;p&gt;&amp;nbsp;&lt;/p&gt;\n&lt;ul data-indent-level=&quot;1&quot;&gt;\n&lt;li&gt;\n&lt;p data-renderer-start-pos=&quot;1228&quot;&gt;Bachelorʼs degree in Computer Science, AI, or related field&lt;/p&gt;\n&lt;/li&gt;\n&lt;li&gt;\n&lt;p data-renderer-start-pos=&quot;1292&quot;&gt;Minimum of &lt;span data-renderer-mark=&quot;true&quot; data-text-custom-color=&quot;#36b37e&quot;&gt;6&lt;/span&gt; years professional experience in developing python applications&lt;/p&gt;\n&lt;/li&gt;\n&lt;li&gt;\n&lt;p data-renderer-start-pos=&quot;1374&quot;&gt;&lt;span data-renderer-mark=&quot;true&quot; data-text-custom-color=&quot;#36b37e&quot;&gt;Deep familiarity with Python 3.x, including advanced features (asyncio, type hints, context managers)&lt;/span&gt;&lt;/p&gt;\n&lt;/li&gt;\n&lt;li&gt;\n&lt;p data-renderer-start-pos=&quot;1480&quot;&gt;&lt;span data-renderer-mark=&quot;true&quot; data-text-custom-color=&quot;#36b37e&quot;&gt;Solid understanding of software design patterns, object‐oriented design, and modular architecture&lt;/span&gt;&lt;/p&gt;\n",
+   "departments": [
+    {
+     "id": 4017842002,
+     "name": "Technology",
+     "child_ids": [
+      4035444002,
+      4035445002,
+      4078829002,
+      4078830002,
+      4078831002
+     ],
+     "parent_id": null
+    }
+   ],
+   "offices": [
+    {
+     "id": 4040190002,
+     "name": "Amsterdam",
+     "location": "Amsterdam, North Holland, Netherlands",
+     "child_ids": [],
+     "parent_id": 4040189002
+    }
+   ],
+   "ai_disclaimer": null,
+   "include_ai_disclaimer": null,
+   "ai_opt_out_request_url": null
+  },
+  {
+   "absolute_url": "https://www.optiver.com/join-us/jobs/8644364002/?gh_jid=8644364002",
+   "data_compliance": [
+    {
+     "type": "gdpr",
+     "requires_consent": false,
+     "requires_processing_consent": false,
+     "requires_retention_consent": false,
+     "retention_period": null,
+     "demographic_data_consent_applies": false
+    }
+   ],
+   "education": "education_required",
+   "internal_job_id": 6452356002,
+   "location": {
+    "name": "Shanghai, China"
+   },
+   "metadata": [
+    {
+     "id": 4258682002,
+     "name": "Workflow",
+     "value": "Campus",
+     "value_type": "single_select"
+    },
+    {
+     "id": 11001941002,
+     "name": "Website Level Mapping",
+     "value": "Internship",
+     "value_type": "single_select"
+    },
+    {
+     "id": 115810240002,
+     "name": "Global - Leadership Owner",
+     "value": {
+      "name": "Jane Chen",
+      "email": "jane.chen@optiver.com.au",
+      "user_id": 5034864002,
+      "employee_id": null
+     },
+     "value_type": "user"
+    },
+    {
+     "id": 116861118002,
+     "name": "Requisition Type",
+     "value": "Internship Requisition",
+     "value_type": "single_select"
+    }
+   ],
+   "id": 8644364002,
+   "updated_at": "2026-10-13T03:32:14-04:00",
+   "requisition_id": "3037",
+   "title": "2027 Shanghai FPGA Developer Summer Internship",
+   "company_name": "Optiver ",
+   "first_published": "2026-08-12T06:13:46-04:00",
+   "language": "en",
+   "application_deadline": null,
+   "content": "&lt;p data-renderer-start-pos=&quot;30116&quot; data-local-id=&quot;965bc7c6-4204-48b5-a23c-c418f7ff2417&quot;&gt;At Optiver, FPGAs play a critical role in executing successful trades. With no external clients, we operate in a fast feedback, quick release environment.&amp;nbsp;&lt;/p&gt;\n&lt;p data-renderer-start-pos=&quot;30273&quot; data-local-id=&quot;b07b1ee0a2ff&quot;&gt;As a FPGA Developer Intern at Optiver, you’ll work alongside experienced hardware engineers to ensure we have the fastest and most reliable trading systems in the industry.&amp;nbsp;You’ll constantly be innovating with new technology in the hardware space, ensuring our latency is optimised to nanoseconds.&lt;/p&gt;\n&lt;p data-renderer-start-pos=&quot;30572&quot; data-local-id=&quot;f3a05f65c4b8&quot;&gt;By the end of the 8-week internship, you’ll have deepened your understanding of how technology is used in the quantitative trading industry. Plus, if you’ve excelled over the summer, you’ll receive an offer to return as a Graduate FPGA Developer.&lt;/p&gt;\n&lt;p data-renderer-start-pos=&quot;30820&quot; data-local-id=&quot;ee10dd2288e1&quot;&gt;&lt;strong data-renderer-mark=&quot;true&quot;&gt;What you’ll do:&lt;/strong&gt;&lt;/p&gt;\n&lt;p data-renderer-start-pos=&quot;30837&quot; data-local-id=&quot;58149d7a7ca1&quot;&gt;Led by our in-house education team that consists of ex-traders and engineers, you’ll delve into advanced engineering concepts and lead innovative projects, during our world-class training program. In just a few weeks, you’ll develop latency-critical applications that contribute towards our trading success.&lt;/p&gt;\n&lt;p data-renderer-start-pos=&quot;31146&quot; data-local-id=&quot;ff427b5e009d&quot;&gt;During the internship, you will be paired with one of Optiver’s seasoned FPGA developers, providing you exposure to a variety of areas, including:&lt;/p&gt;\n&lt;ul class=&quot;ak-ul&quot; data-local-id=&quot;3a83df0f-6768-4095-875e-b242cd4a39ab&quot; data-indent-level=&quot;1&quot;&gt;\n&lt;li&gt;\n&lt;p data-renderer-start-pos=&quot;31296&quot; data-local-id=&quot;4fccd18a7c4a&quot;&gt;Designing highly accurate and efficient systems that respond to the financial markets in real time.&lt;/p&gt;\n&lt;/li&gt;\n&lt;li&gt;\n&lt;p data-renderer-start-pos=&quot;31399&quot; data-local-id=&quot;28b1e8895880&quot;&gt;Improving infrastructure and trading systems using the latest FPGA devices, tools and techniques.&lt;/p&gt;\n&lt;/li&gt;\n&lt;li&gt;\n&lt;p data-renderer-start-pos=&quot;31500&quot; data-local-id=&quot;f5b350a02461&quot;&gt;Developing rigorous RTL codes or test benches using a combination of VHDL and System Verilog.&lt;/p&gt;\n&lt;/li&gt;\n&lt;li&gt;\n&lt;p data-renderer-start-pos=&quot;31597&quot; data-local-id=&quot;ba98fb44ece9&quot;&gt;Investigate and explore innovative machine learning algorithms and cutting-edge data communication/processing technologies to optimize and enhance existing trading systems.&lt;/p&gt;\n&lt;/li&gt;\n&lt;/ul&gt;\n&lt;p data-renderer-st",
+   "departments": [
+    {
+     "id": 4078829002,
+     "name": "Hardware",
+     "child_ids": [],
+     "parent_id": 4017842002
+    }
+   ],
+   "offices": [
+    {
+     "id": 4046256002,
+     "name": "Shanghai",
+     "location": "Shanghai",
+     "child_ids": [],
+     "parent_id": 4044916002
+    }
+   ],
+   "ai_disclaimer": null,
+   "include_ai_disclaimer": null,
+   "ai_opt_out_request_url": null
+  }
+ ],
+ "meta": {
+  "total": 4
+ }
+}
