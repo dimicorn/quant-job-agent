@@ -40,6 +40,7 @@ firms:
   # ── Квант-фонды ──
   - {name: Qube Research & Technologies, ats: greenhouse, token: quberesearchandtechnologies, tier: 1}
   - {name: Squarepoint Capital, ats: greenhouse, token: squarepointcapital, tier: 1}
+  - {name: Marshall Wace, ats: greenhouse, token: mw-tech-grad, tier: 1}  # доска graduate-программ
   - {name: Quadrature, ats: ashby, token: quadrature, tier: 1}
   - {name: Aquatic Capital Management, ats: greenhouse, token: aquaticcapitalmanagement, tier: 2}
   - {name: Voleon, ats: ashby, token: voleon, tier: 2}
