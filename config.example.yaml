@@ -103,6 +103,17 @@ apply:
   delay_seconds: [90, 240]           #   пауза между заявками
   max_consecutive_errors: 3
 
+# Почта для кодов подтверждения: Greenhouse после Submit присылает security code на email из profile —
+# агент читает его по IMAP, вписывает и отправляет форму. Для Gmail: включите двухэтапную аутентификацию,
+# создайте пароль приложения на myaccount.google.com/apppasswords и запишите в .env: IMAP_PASSWORD=abcdabcdabcdabcd
+# Проверка: uv run quant-agent mail. Пароля нет — код вводите вы, агент пришлёт уведомление.
+mail:
+  imap_host: imap.gmail.com
+  user: ""                           # "" — profile.email
+  password_env: IMAP_PASSWORD        # имя переменной в окружении или в .env
+  folders: [INBOX]
+  code_wait_seconds: 180             # сколько ждать письмо с кодом
+
 # PDF резюме, который загружать в форму, по треку вакансии: qr — quant research, qd — quant dev / C++,
 # infra — ML-инфраструктура, other — остальное. {} — materials/resume.pdf (uv run quant-agent pdf).
 resume_pdfs: {}

@@ -69,6 +69,7 @@ def apply_one(cfg: Config, db: DB, page, row: dict, plan: answers.Plan, mode: st
     console.print(f"Заполняю: {title} ({row['score']})")
     source, cls = APPLIERS[row["ats"]]
     ap = cls(page, cfg, mode)
+    ap.firm = row["firm"]
     files = Path(cfg.path("materials/tmp"))
     files.mkdir(parents=True, exist_ok=True)
     try:

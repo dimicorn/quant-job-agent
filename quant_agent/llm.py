@@ -183,20 +183,8 @@ def _parse(text: str, model: type[T]) -> T:
 
 
 def api_key(cfg: Config) -> str:
-    """Ключ для openai: из переменной окружения, иначе из файла .env рядом с config.yaml
-    (launchd не видит переменных из ~/.zshrc)."""
-    name = cfg.analyst.api_key_env
-    if not name:
-        return ""
-    if os.environ.get(name):
-        return os.environ[name]
-    env = cfg.path(".env")
-    if env.exists():
-        for line in env.read_text(encoding="utf-8").splitlines():
-            k, _, v = line.partition("=")
-            if k.strip().removeprefix("export ").strip() == name:  # и «export KEY=…» (для source .env)
-                return v.strip().strip('"').strip("'")
-    return ""
+    """Ключ для openai: из переменной окружения, иначе из файла .env рядом с config.yaml."""
+    return cfg.secret(cfg.analyst.api_key_env)
 
 
 _FORMAT: dict[str, int] = {}  # base_url → какой response_format сервер принял (индекс в списке ниже)

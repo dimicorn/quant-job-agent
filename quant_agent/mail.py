@@ -1,0 +1,145 @@
+"""Коды подтверждения из почты (IMAP). Greenhouse после Submit просит security code из письма
+«Security code for your application to <фирма>»: агент ждёт письмо, достаёт код и вписывает его в форму.
+
+Письма читаются через BODY.PEEK — непрочитанными они и остаются. Разбор письма отделён от сети
+(parse_message, extract_code) и проверяется тестами."""
+from __future__ import annotations
+
+import email
+import imaplib
+import re
+from dataclasses import dataclass
+from datetime import UTC, datetime, timedelta
+from email.header import decode_header, make_header
+from email.message import Message
+from email.utils import parsedate_to_datetime
+
+from . import stop
+from .config import Config
+from .jobs import html_to_text
+
+SUBJECT = re.compile(r"security code|verification code|confirmation code|one[- ]time|\bcode\b|код", re.I)
+# «…paste this code into the security code field on your application: dU9xKmLP»
+AFTER_COLON = re.compile(r"\bcode\b[^:\n]{0,120}:\s*([A-Za-z0-9]{4,12})\b", re.I)
+# «Your verification code is 123456»
+CODE_IS = re.compile(r"\bcode\s+is\s*:?\s*([A-Za-z0-9]{4,12})\b", re.I)
+ALONE = re.compile(r"^\s*([A-Za-z0-9]{4,12})\s*$", re.M)  # код отдельной строкой
+
+
+class MailError(Exception):
+    """Почта не настроена или не отвечает."""
+
+
+@dataclass
+class Letter:
+    date: datetime
+    sender: str
+    subject: str
+    body: str
+
+
+def _looks_like_code(s: str) -> bool:
+    """Не слово: есть цифра или смешанный регистр («dU9xKmLP», «483920»)."""
+    return any(c.isdigit() for c in s) or (s != s.lower() and s != s.upper() and not s.istitle())
+
+
+def extract_code(subject: str, body: str) -> str | None:
+    for rx in (AFTER_COLON, CODE_IS):
+        for m in rx.finditer(body):
+            if _looks_like_code(m.group(1)):
+                return m.group(1)
+    if SUBJECT.search(subject):
+        for m in ALONE.finditer(body):
+            if _looks_like_code(m.group(1)):
+                return m.group(1)
+    return None
+
+
+def _header(msg: Message, name: str) -> str:
+    return str(make_header(decode_header(msg.get(name, "") or "")))
+
+
+def _body(msg: Message) -> str:
+    plain, rich = "", ""
+    for part in msg.walk() if msg.is_multipart() else [msg]:
+        ctype = part.get_content_type()
+        if ctype not in ("text/plain", "text/html") or part.get_filename():
+            continue
+        data = part.get_payload(decode=True) or b""
+        text = data.decode(part.get_content_charset() or "utf-8", "replace")
+        if ctype == "text/plain" and not plain:
+            plain = text
+        elif ctype == "text/html" and not rich:
+            rich = html_to_text(text)
+    return plain or rich
+
+
+def parse_message(raw: bytes) -> Letter:
+    msg = email.message_from_bytes(raw)
+    try:
+        date = parsedate_to_datetime(msg.get("Date"))
+        date = date if date.tzinfo else date.replace(tzinfo=UTC)
+    except (TypeError, ValueError):
+        date = datetime.now(UTC)
+    return Letter(date, _header(msg, "From"), _header(msg, "Subject"), _body(msg))
+
+
+def pick_code(letters: list[Letter], since: datetime, hint: str = "") -> str | None:
+    """Код из самого свежего письма не старше since; письма, где упомянута фирма (hint), — первыми."""
+    fresh = sorted((x for x in letters if x.date >= since), key=lambda x: x.date, reverse=True)
+    h = hint.split()[0].lower() if hint.strip() else ""
+    for group in ([x for x in fresh if h and h in (x.subject + x.body).lower()], fresh):
+        for x in group:
+            code = extract_code(x.subject, x.body)
+            if code:
+                return code
+    return None
+
+
+def configured(cfg: Config) -> bool:
+    return bool(cfg.secret(cfg.mail.password_env) and (cfg.mail.user or cfg.profile.email))
+
+
+def connect(cfg: Config) -> imaplib.IMAP4_SSL:
+    user, password = cfg.mail.user or cfg.profile.email, cfg.secret(cfg.mail.password_env)
+    if not (user and password):
+        raise MailError(f"нет адреса или пароля: profile.email / mail.user и {cfg.mail.password_env} в .env")
+    try:
+        box = imaplib.IMAP4_SSL(cfg.mail.imap_host, timeout=30)
+        box.login(user, password.replace(" ", ""))  # Google показывает пароль приложения группами через пробел
+    except (OSError, imaplib.IMAP4.error) as e:
+        raise MailError(f"IMAP {cfg.mail.imap_host}: {e}") from e
+    return box
+
+
+def recent(box: imaplib.IMAP4_SSL, folder: str, since: datetime, limit: int = 30) -> list[Letter]:
+    """Письма папки с даты since (IMAP ищет по дням — точнее отсекает pick_code), новые первыми."""
+    box.select(f'"{folder}"', readonly=True)
+    _, data = box.search(None, f'(SINCE "{since.astimezone(UTC):%d-%b-%Y}")')
+    out = []
+    for num in reversed((data[0] or b"").split()[-limit:]):
+        _, parts = box.fetch(num, "(BODY.PEEK[])")
+        raw = next((p[1] for p in parts if isinstance(p, tuple)), None)
+        if raw:
+            out.append(parse_message(raw))
+    return out
+
+
+def wait_code(cfg: Config, since: datetime, hint: str = "", timeout: float | None = None) -> str | None:
+    """Ждём письмо с кодом, пришедшее после since. Нет за timeout — None."""
+    timeout = cfg.mail.code_wait_seconds if timeout is None else timeout
+    since = since - timedelta(seconds=60)  # часы почтового сервера могут отставать
+    end = datetime.now(UTC) + timedelta(seconds=timeout)
+    box = connect(cfg)
+    try:
+        while True:
+            letters = [x for f in cfg.mail.folders for x in recent(box, f, since)]
+            code = pick_code(letters, since, hint)
+            if code or datetime.now(UTC) >= end or stop.wait(5):
+                return code
+            box.noop()
+    finally:
+        try:
+            box.logout()
+        except Exception:  # noqa: BLE001
+            pass

@@ -1,6 +1,7 @@
 """Настройки (config.yaml). Относительные пути считаются от папки конфига: cfg.path()."""
 from __future__ import annotations
 
+import os
 from pathlib import Path
 from typing import Any, Literal
 
@@ -107,6 +108,16 @@ class Apply(BaseModel):
     max_consecutive_errors: int = 3
 
 
+class Mail(BaseModel):
+    """Почта для кодов подтверждения: Greenhouse после Submit присылает security code на email анкеты.
+    IMAP; для Gmail — пароль приложения (myaccount.google.com/apppasswords), не обычный пароль."""
+    imap_host: str = "imap.gmail.com"
+    user: str = ""                         # "" — profile.email
+    password_env: str = "IMAP_PASSWORD"    # переменная окружения или строка в .env рядом с config.yaml
+    folders: list[str] = Field(default_factory=lambda: ["INBOX"])
+    code_wait_seconds: int = 180           # сколько ждать письмо с кодом
+
+
 class Config(BaseModel):
     analyst: Analyst = Field(default_factory=Analyst)
     filters: Filters = Field(default_factory=Filters)
@@ -114,6 +125,7 @@ class Config(BaseModel):
     watch: Watch = Field(default_factory=Watch)
     profile: Profile = Field(default_factory=Profile)
     apply: Apply = Field(default_factory=Apply)
+    mail: Mail = Field(default_factory=Mail)
     facts: str = ""                        # факты о вас, которых нет в резюме
     hh_agent_dir: str = ""                 # папка hh-agent: его questions.facts и faq.yaml — дополнительные факты
     # PDF резюме для загрузки в форму по треку (qr | qd | infra | other); нет трека — materials/resume.pdf
@@ -126,6 +138,20 @@ class Config(BaseModel):
     def path(self, p: str) -> Path:
         q = Path(p).expanduser()
         return q if q.is_absolute() else self.base_dir / q
+
+    def secret(self, name: str) -> str:
+        """Значение из окружения, иначе из .env рядом с config.yaml (launchd не видит переменных из ~/.zshrc)."""
+        if not name:
+            return ""
+        if os.environ.get(name):
+            return os.environ[name]
+        env = self.path(".env")
+        if env.exists():
+            for line in env.read_text(encoding="utf-8").splitlines():
+                k, _, v = line.partition("=")
+                if k.strip().removeprefix("export ").strip() == name:  # и «export KEY=…» (для source .env)
+                    return v.strip().strip('"').strip("'")
+        return ""
 
     def resume_text(self) -> str:
         f = self.path(self.analyst.resume_file)

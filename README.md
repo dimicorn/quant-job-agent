@@ -61,10 +61,14 @@ uv run quant-agent apply <uid> --mode assist         # одна вакансия
   профиля. После заполнения каждое поле сверяется с планом; не сошлось — `manual` со снимком экрана, заявка не уходит.
 - **Режимы** (`apply.mode`): `assist` — агент заполняет, Submit нажимаете вы (агент ждёт страницу подтверждения);
   `auto` — Submit жмёт агент, при reCAPTCHA с задачей — уведомление и ожидание вас; `dry_run` — только снимок.
+- **Код из письма.** Greenhouse после Submit просит security code из письма. Агент видит поле кода, читает письмо
+  по IMAP (секция `mail`), вписывает код и снова жмёт Submit — и в `assist`, и в `auto`. Для Gmail нужен пароль
+  приложения (myaccount.google.com/apppasswords) в `.env`: `IMAP_PASSWORD=…`. Проверка: `uv run quant-agent mail`.
+  Пароля нет или письмо не пришло за `mail.code_wait_seconds` — уведомление, код вводите вы.
 - **Лимиты**: одна вакансия фирмы за проход, `max_applications` за `cooldown_months` на фирму, `apply.daily_limit`,
   `apply.max_per_run`, рабочие часы. Подаёт только на вакансии с баллом ≥ `apply.min_score` и с письмом.
 
-Workday, getmatch.ru и почта (LinkedIn/eFC алерты) — следующие шаги.
+Workday и письма-алерты LinkedIn/eFC — следующие шаги. getmatch.ru — через Telegram-бота в hh-agent.
 
 ## Разработка
 

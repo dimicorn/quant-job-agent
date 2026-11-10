@@ -318,6 +318,29 @@ def cmd_mark(cfg: Config, args) -> int:
     return 0
 
 
+def cmd_mail(cfg: Config, args) -> int:
+    """Проверка почты: вход по IMAP и последние письма с кодами за args.days дней."""
+    from datetime import UTC, datetime, timedelta
+
+    from . import mail
+    since = datetime.now(UTC) - timedelta(days=args.days)
+    try:
+        box = mail.connect(cfg)
+    except mail.MailError as e:
+        console.print(f"[red]Почта не настроена:[/] {e}")
+        return 1
+    try:
+        letters = [x for f in cfg.mail.folders for x in mail.recent(box, f, since, limit=200)]
+    finally:
+        box.logout()
+    console.print(f"[green]Вход в {cfg.mail.imap_host} — ок.[/] Писем за {args.days} дн.: {len(letters)}")
+    for x in letters:
+        code = mail.extract_code(x.subject, x.body)
+        if code:
+            console.print(f"  {x.date:%Y-%m-%d %H:%M}  {x.subject[:70]}  → код {code}")
+    return 0
+
+
 def cmd_stats(cfg: Config, args) -> int:
     db = _open(cfg)
     counts = db.counts()
@@ -343,8 +366,9 @@ HELP = """Команды:
   pdf [--uid UID]              PDF резюме (materials/resume.pdf) с ATS-проверкой; --uid — ещё и письмо в PDF
   answers                      ответить на вопросы анкет, которых агент не знает (сохраняются в answers.yaml)
   apply <uid> [--mode M]       заполнить форму одной вакансии (assist | auto | dry_run)
-  autopilot [--mode M] [--once]   опрос досок → письма → формы Greenhouse; лимиты из apply
+  autopilot [--mode M] [--once]   опрос досок → письма → формы Greenhouse, Lever, Ashby; лимиты из apply
   mark <uid> <status>          поменять статус: applied, oa, interview, offer, rejected, skipped…
+  mail [--days N]              проверить почту (IMAP): вход и найденные коды подтверждения
   stats                        статусы вакансий и здоровье досок"""
 
 
@@ -386,6 +410,8 @@ def main(argv: list[str] | None = None) -> int:
     s.add_argument("uid")
     s.add_argument("status", choices=STATUSES)
     s.add_argument("--note")
+    s = sub.add_parser("mail")
+    s.add_argument("--days", type=int, default=3)
     sub.add_parser("stats")
     args = p.parse_args(argv)
     if args.cmd in (None, "help"):
@@ -394,7 +420,8 @@ def main(argv: list[str] | None = None) -> int:
     stop.install()
     cfg = load_config(args.config)
     cmds = {"firms": cmd_firms, "watch": cmd_watch, "analyze": cmd_analyze, "list": cmd_list, "review": cmd_review,
-            "add": cmd_add, "letters": cmd_letters, "answers": cmd_answers, "apply": cmd_apply, "autopilot": cmd_autopilot, "pdf": cmd_pdf, "mark": cmd_mark, "stats": cmd_stats}
+            "add": cmd_add, "letters": cmd_letters, "answers": cmd_answers, "apply": cmd_apply, "autopilot": cmd_autopilot, "pdf": cmd_pdf, "mark": cmd_mark, "mail": cmd_mail,
+            "stats": cmd_stats}
     try:
         return cmds[args.cmd](cfg, args)
     except (KeyboardInterrupt, stop.Stopped):

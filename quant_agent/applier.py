@@ -11,10 +11,10 @@ from __future__ import annotations
 import random
 import re
 from concurrent.futures import ThreadPoolExecutor
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 
-from . import stop
+from . import mail, stop
 from .answers import Plan, Step
 from .config import Config
 from .log import console
@@ -26,6 +26,9 @@ OPT = ".select__option"
 DOM_IDS = {"location": "candidate-location"}  # id поля в API → id элемента в форме, где они не совпадают
 CONFIRM = re.compile(r"thank you for applying|application (has been |was )?(successfully )?(submitted|received)"
                      r"|successfully submitted|we('| ha)ve received your application", re.I)
+# Поле кода из письма после Submit: у Greenhouse — 8 клеток security-input-0…7
+CODE_INPUTS = ("input[id^='security-input'], input[id*='security-code'], input[id*='security_code'], "
+               "input[autocomplete='one-time-code']")
 # Подпись чекбокса или радиокнопки: обёртка <label> или <label for=id>
 LABEL_JS = ("e => ((e.closest('label') || document.querySelector(`label[for=\"${CSS.escape(e.id)}\"]`) || {})"
             ".innerText || '').trim()")
@@ -57,6 +60,9 @@ class FormApplier:
     def __init__(self, page, cfg: Config, mode: str | None = None):
         self.page, self.cfg = page, cfg
         self.mode = mode or cfg.apply.mode
+        self.firm = ""            # для поиска письма с кодом: письма, где упомянута фирма, — первыми
+        self._code_since: datetime | None = None
+        self._code_done = False
 
     # ── паузы и ввод ──
     def _beat(self) -> None:
@@ -183,11 +189,52 @@ class FormApplier:
         except Exception:  # noqa: BLE001 — страница перезагружается
             return False
 
+    def _code_boxes(self):
+        boxes = self.page.locator(CODE_INPUTS)
+        try:
+            return boxes if boxes.count() and boxes.first.is_visible() else None
+        except Exception:  # noqa: BLE001 — страница перезагружается
+            return None
+
+    def _enter_code(self, boxes) -> None:
+        """Форма просит код из письма: берём его из почты, вписываем и снова жмём Submit (решение об отправке
+        уже принято — вами в assist или режимом auto). Почты нет или письмо не пришло — просим ввести вручную."""
+        self._code_done = True
+        if not mail.configured(self.cfg):
+            notify("Нужен код из письма", "введите security code из почты и нажмите Submit")
+            console.print("[yellow]Форма просит код из письма — введите его в окне браузера "
+                          "(чтобы агент делал это сам, настройте почту: секция mail в config.yaml).[/]")
+            return
+        console.print("Форма просит код из письма — жду его в почте…")
+        try:
+            code = mail.wait_code(self.cfg, self._code_since or datetime.now(UTC), self.firm)
+        except mail.MailError as e:
+            code = None
+            console.print(f"[yellow]Почта: {e}[/]")
+        if not code:
+            notify("Нужен код из письма", "агент не нашёл письмо с кодом — введите его и нажмите Submit")
+            console.print("[yellow]Письма с кодом нет — введите код в окне браузера сами.[/]")
+            return
+        n = boxes.count()
+        if n > 1:  # по клетке на символ
+            for i, ch in enumerate(code[:n]):
+                boxes.nth(i).fill(ch)
+        else:
+            boxes.first.fill(code)
+        self._beat()
+        self.page.locator(self.SUBMIT).first.click()
+        console.print("Код из письма введён, форма отправлена.")
+
     def _wait_confirmed(self, seconds: float) -> bool:
         end = datetime.now().timestamp() + seconds
         while datetime.now().timestamp() < end:
             if self.confirmed():
                 return True
+            if not self._code_done:
+                boxes = self._code_boxes()
+                if boxes is not None:
+                    self._enter_code(boxes)
+                    continue
             if stop.wait(2):
                 return False
         return False
@@ -196,6 +243,7 @@ class FormApplier:
         """После fill и verify. Вернуть (статус, заметка)."""
         if self.mode == "dry_run":
             return "dry_run", f"снимок: {self.screenshot(title)}"
+        self._code_since = datetime.now(UTC)  # письмо с кодом придёт после Submit
         if self.mode == "assist":
             self.page.bring_to_front()
             notify("Форма заполнена", f"{title}: проверьте и нажмите Submit application")
