@@ -46,8 +46,27 @@ def place_match(option: str, wanted: str) -> bool:
     return len(o) > 1 and len(w) > 1 and o[0] == w[0] and (w[-1].startswith(o[-1]) or o[-1].startswith(w[-1]))
 
 
+def fit(text: str, limit: int) -> str | None:
+    """Ответ в лимит поля (maxlength) целыми предложениями; первое не влезает — None."""
+    out = ""
+    for sent in re.split(r"(?<=[.!?])\s+", text.strip()):
+        nxt = f"{out} {sent}".strip()
+        if len(nxt) > limit:
+            break
+        out = nxt
+    return out or None
+
+
+def _norm(text: str) -> str:
+    return " ".join(text.split())
+
+
 class FormError(Exception):
     """Форма не заполнилась как надо — заявку не отправляем."""
+
+
+class BrowserClosed(Exception):
+    """Окно браузера закрыли — вакансия остаётся в очереди."""
 
 
 class FormApplier:
@@ -134,7 +153,17 @@ class FormApplier:
 
     def _step(self, s: Step, files_dir: Path) -> None:
         if s.kind in ("text", "textarea"):
-            self._type(self.field(s), s.value[0])
+            el = self.field(s)
+            value = s.value[0] if s.kind == "textarea" else _norm(s.value[0])  # в однострочном поле нет переносов
+            limit = int(el.get_attribute("maxlength") or 0)
+            if limit > 0 and len(value) > limit:
+                short = fit(value, limit)
+                if not short:
+                    raise FormError(f"«{s.label[:60]}»: ответ длиннее лимита поля ({len(value)} > {limit})")
+                console.print(f"[yellow]«{s.label[:60]}»: ответ сокращён до {len(short)} символов (лимит {limit})[/]")
+                value = short
+            s.value = [value]  # verify сверяет с тем, что напечатано
+            self._type(el, value)
         elif s.kind == "file":
             path = self._letter_pdf(s.value[0], files_dir) if s.source == "letter" else s.value[0]
             self.field(s).set_input_files(path)
@@ -171,8 +200,8 @@ class FormApplier:
                     g, w = re.sub(r"\D", "", got), re.sub(r"\D", "", s.value[0])
                     if len(g) < 7 or not (w.endswith(g) or g.endswith(w)):
                         problems.append(f"«{s.label[:60]}»: номер не совпал ({got})")
-                elif got.strip() != s.value[0].strip():
-                    problems.append(f"«{s.label[:60]}»: текст не совпал")
+                elif _norm(got) != _norm(s.value[0]):
+                    problems.append(f"«{s.label[:60]}»: текст не совпал ({len(got)} из {len(s.value[0])} символов)")
         return problems
 
     def screenshot(self, name: str) -> Path:
@@ -228,6 +257,8 @@ class FormApplier:
     def _wait_confirmed(self, seconds: float) -> bool:
         end = datetime.now().timestamp() + seconds
         while datetime.now().timestamp() < end:
+            if self.page.is_closed():
+                raise BrowserClosed
             if self.confirmed():
                 return True
             if not self._code_done:

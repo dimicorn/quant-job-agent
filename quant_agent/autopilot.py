@@ -12,8 +12,10 @@ import random
 from datetime import datetime
 from pathlib import Path
 
+from playwright.sync_api import Error as PlaywrightError
+
 from . import answers, materials, stop, watch
-from .applier import FormError, GreenhouseApplier
+from .applier import BrowserClosed, FormError, GreenhouseApplier
 from .applier_ashby import AshbyApplier
 from .applier_lever import LeverApplier
 from .config import Config
@@ -81,6 +83,12 @@ def apply_one(cfg: Config, db: DB, page, row: dict, plan: answers.Plan, mode: st
         status, note = ap.submit(title)
     except FormError as e:
         status, note = "manual", f"форма: {e}; снимок: {ap.screenshot(title)}"
+    except (BrowserClosed, PlaywrightError) as e:
+        if not page.is_closed() and not isinstance(e, BrowserClosed):
+            status, note = "error", f"браузер: {str(e).splitlines()[0][:200]}"
+        else:
+            console.print(f"[yellow]Окно браузера закрыто — {title} остаётся в очереди.[/]")
+            return "closed"
     if status == "applied":
         db.update(row["uid"], status="applied", applied_at=now(), note=note, error=None)
         console.print(f"[green]✓ {title}[/]: {note}")
@@ -107,11 +115,18 @@ class Browser:
             self._ctx = self._pw.chromium.launch_persistent_context(
                 str(self.cfg.path(self.cfg.apply.profile_dir)), headless=self.cfg.apply.headless,
                 viewport={"width": 1280, "height": 900})
-        return self._ctx.pages[0] if self._ctx.pages else self._ctx.new_page()
+        try:
+            return self._ctx.pages[0] if self._ctx.pages else self._ctx.new_page()
+        except PlaywrightError:  # окно закрыли — запускаем браузер заново
+            self.close()
+            return self.page()
 
     def close(self) -> None:
         if self._ctx is not None:
-            self._ctx.close()
+            try:
+                self._ctx.close()
+            except PlaywrightError:  # уже закрыт
+                pass
             self._pw.stop()
             self._ctx = None
 
@@ -142,6 +157,10 @@ def run_once(cfg: Config, db: DB, browser: Browser, mode: str | None = None, pol
         if status == "applied":
             sent, errors = sent + 1, 0
             if stop.wait(random.uniform(*cfg.apply.delay_seconds)):
+                break
+        elif status == "closed":
+            browser.close()  # следующая заявка откроет новое окно
+            if stop.wait(30):
                 break
         elif status in ("error", "manual"):
             errors += 1
