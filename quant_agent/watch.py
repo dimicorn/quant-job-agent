@@ -168,14 +168,3 @@ def run_once(cfg: Config, db: DB, firms: list[Firm] | None = None, score: bool =
     log_event(cfg, "watch", **s.__dict__)
     return s
 
-
-def loop(cfg: Config, db: DB, score: bool = True) -> None:
-    """watch без --once: опрос каждые watch.every_minutes, пока не нажмут Ctrl+C."""
-    while not stop.requested():
-        try:
-            run_once(cfg, db, score=score)
-        except stop.Stopped:
-            break
-        console.print(f"Следующий опрос через {cfg.watch.every_minutes} мин. Ctrl+C — выход.")
-        if stop.wait(cfg.watch.every_minutes * 60):
-            break

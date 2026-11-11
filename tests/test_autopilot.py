@@ -48,9 +48,6 @@ def test_run_once_needs_answers_and_daily_limit(cfg, db, monkeypatch):
         return "applied"
     monkeypatch.setattr(autopilot, "apply_one", fake_apply)
 
-    class NoBrowser:
-        def page(self):
-            return None
     assert autopilot.run_once(cfg, db, NoBrowser(), poll=False) == 1
     assert applied == ["greenhouse:imc:2"]
     row = db.get("greenhouse:optiverus:1")
@@ -65,3 +62,56 @@ def test_active_hours(cfg):
     assert autopilot.in_hours(cfg, datetime(2026, 11, 9, 10))       # понедельник
     assert not autopilot.in_hours(cfg, datetime(2026, 11, 9, 20))
     assert not autopilot.in_hours(cfg, datetime(2026, 11, 8, 10))   # воскресенье
+
+
+class NoBrowser:
+    def page(self):
+        return None
+
+    def close(self):
+        pass
+
+
+def _fake_apply(applied):
+    def fake(cfg, db, page, row, plan, mode=None):
+        applied.append(row["uid"])
+        db.update(row["uid"], status="applied", applied_at=autopilot.now())
+        return "applied"
+    return fake
+
+
+def test_run_once_drains_queue_and_spreads_firms(cfg, db, monkeypatch):
+    """Вторая вакансия фирмы уходит в том же проходе (лимит 2), но после первых вакансий других фирм."""
+    cfg.apply.min_score, cfg.apply.daily_limit = 80, 10
+    cfg.apply.delay_seconds, cfg.apply.active_hours = (0, 0), (0, 24)
+    firms = [Firm(name="IMC", ats="greenhouse", token="imc", tier=1, max_applications=2),
+             Firm(name="Optiver", ats="greenhouse", token="optiverus", tier=1, max_applications=2)]
+    add(db, "greenhouse:imc:1", "IMC", 95)
+    add(db, "greenhouse:imc:2", "IMC", 94)
+    add(db, "greenhouse:imc:3", "IMC", 93)                  # третья — сверх лимита фирмы
+    add(db, "greenhouse:optiverus:4", "Optiver", 85)
+    monkeypatch.setattr(autopilot, "load_firms", lambda cfg: firms)
+    monkeypatch.setattr(autopilot, "prepare", lambda cfg, db, row: Plan([], []))
+    applied = []
+    monkeypatch.setattr(autopilot, "apply_one", _fake_apply(applied))
+    assert autopilot.run_once(cfg, db, NoBrowser(), poll=False) == 3
+    assert applied == ["greenhouse:imc:1", "greenhouse:optiverus:4", "greenhouse:imc:2"]
+
+
+def test_run_once_applies_what_background_poll_finds(cfg, db, monkeypatch):
+    """Пока опрос и оценка идут в фоне, заявки ждут; новая подходящая вакансия подаётся в том же проходе."""
+    cfg.apply.min_score, cfg.apply.daily_limit = 80, 10
+    cfg.apply.delay_seconds, cfg.apply.active_hours = (0, 0), (0, 24)
+    monkeypatch.setattr(autopilot, "load_firms", lambda cfg: FIRMS)
+    monkeypatch.setattr(autopilot, "prepare", lambda cfg, db, row: Plan([], []))
+    monkeypatch.setattr(autopilot.stop, "wait", lambda s: __import__("time").sleep(0.05) or False)
+
+    def fake_poll(cfg, pdb, firms):
+        __import__("time").sleep(0.2)
+        add(pdb, "greenhouse:imc:7", "IMC", 91)
+    monkeypatch.setattr(autopilot.watch, "run_once", fake_poll)
+    monkeypatch.setattr(autopilot.materials, "write_letters", lambda *a, **k: None)
+    applied = []
+    monkeypatch.setattr(autopilot, "apply_one", _fake_apply(applied))
+    assert autopilot.run_once(cfg, db, NoBrowser()) == 1
+    assert applied == ["greenhouse:imc:7"]

@@ -47,11 +47,7 @@ def cmd_firms(cfg: Config, args) -> int:
 
 
 def cmd_watch(cfg: Config, args) -> int:
-    db = _open(cfg)
-    if args.once:
-        watch.run_once(cfg, db, score=not args.no_llm)
-    else:
-        watch.loop(cfg, db, score=not args.no_llm)
+    watch.run_once(cfg, _open(cfg), score=not args.no_llm)
     return 0
 
 
@@ -124,7 +120,7 @@ def cmd_review(cfg: Config, args) -> int:
     firms = {f.name: f for f in load_firms(cfg)}
     rows = db.for_review(args.min_score or cfg.analyst.min_score, {f.name: f.tier for f in firms.values()})
     if not rows:
-        console.print("Нет вакансий для просмотра. Сначала: uv run quant-agent watch --once")
+        console.print("Нет вакансий для просмотра. Сначала: uv run quant-agent watch")
         return 0
     console.print(f"К просмотру: {len(rows)}. Отклик пока подаёте вы: [o] откроет форму в браузере.")
     for i, row in enumerate(rows, 1):
@@ -299,7 +295,7 @@ def cmd_autopilot(cfg: Config, args) -> int:
     mode = args.mode or cfg.apply.mode
     if mode == "assist":
         console.print("Режим assist: агент заполняет формы, Submit нажимаете вы в окне браузера.")
-    autopilot.loop(cfg, _open(cfg), mode, once=args.once)
+    autopilot.run(cfg, _open(cfg), mode)
     return 0
 
 
@@ -357,7 +353,7 @@ def cmd_stats(cfg: Config, args) -> int:
 
 HELP = """Команды:
   firms [--validate]           список фирм; --validate — проверить, что доски отвечают
-  watch [--once] [--no-llm]    опрашивать доски фирм (по умолчанию — каждые watch.every_minutes)
+  watch [--no-llm]             опросить доски, оценить новые вакансии, выйти
   analyze                      оценить новые вакансии через LLM
   list [--status S] [--min-score N] [--kind K]   вакансии в базе
   review                       просмотр лучших вакансий и отметка заявок (в своём терминале)
@@ -366,7 +362,7 @@ HELP = """Команды:
   pdf [--uid UID]              PDF резюме (materials/resume.pdf) с ATS-проверкой; --uid — ещё и письмо в PDF
   answers                      ответить на вопросы анкет, которых агент не знает (сохраняются в answers.yaml)
   apply <uid> [--mode M]       заполнить форму одной вакансии (assist | auto | dry_run)
-  autopilot [--mode M] [--once]   опрос досок → письма → формы Greenhouse, Lever, Ashby; лимиты из apply
+  autopilot [--mode M]         проход: опрос в фоне, формы подряд из очереди, выход
   mark <uid> <status>          поменять статус: applied, oa, interview, offer, rejected, skipped…
   mail [--days N]              проверить почту (IMAP): вход и найденные коды подтверждения
   stats                        статусы вакансий и здоровье досок"""
@@ -380,7 +376,7 @@ def main(argv: list[str] | None = None) -> int:
     s = sub.add_parser("firms")
     s.add_argument("--validate", action="store_true")
     s = sub.add_parser("watch")
-    s.add_argument("--once", action="store_true")
+    s.add_argument("--once", action="store_true", help=argparse.SUPPRESS)  # старый флаг: проход и так один
     s.add_argument("--no-llm", action="store_true")
     sub.add_parser("analyze")
     s = sub.add_parser("list")
@@ -405,7 +401,7 @@ def main(argv: list[str] | None = None) -> int:
     s.add_argument("--mode", choices=["assist", "auto", "dry_run"])
     s = sub.add_parser("autopilot")
     s.add_argument("--mode", choices=["assist", "auto", "dry_run"])
-    s.add_argument("--once", action="store_true")
+    s.add_argument("--once", action="store_true", help=argparse.SUPPRESS)  # старый флаг: проход и так один
     s = sub.add_parser("mark")
     s.add_argument("uid")
     s.add_argument("status", choices=STATUSES)

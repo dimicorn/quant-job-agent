@@ -52,7 +52,6 @@ class Eligibility(BaseModel):
 
 
 class Watch(BaseModel):
-    every_minutes: int = 90                # как часто опрашивать доски фирм
     notify: bool = True                    # уведомление macOS о новой подходящей вакансии
     workers: int = 6                       # параллельных запросов к доскам
     # списки SimplifyJobs (listings.json): стажировки и вакансии для выпускников из сотен фирм, категория Quant

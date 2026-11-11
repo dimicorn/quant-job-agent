@@ -35,18 +35,17 @@ firms.yaml → доски ATS (публичный JSON API) → тип вака�
 uv sync
 cp config.example.yaml config.yaml      # заполнить eligibility, preferences, резюме
 uv run quant-agent firms --validate     # доски отвечают?
-uv run quant-agent watch --once         # опросить доски и оценить новые вакансии
+uv run quant-agent watch                # опросить доски и оценить новые вакансии
 uv run quant-agent review               # лучшие вакансии; [o] открыть форму, [a] отметить заявку
 uv run quant-agent add <url>            # одна вакансия по ссылке (Greenhouse/Lever/Ashby или любая страница)
-uv run quant-agent watch                # опрос каждые watch.every_minutes, уведомления macOS
 uv run quant-agent stats
 ```
 
 ## Автопилот (Greenhouse, Lever, Ashby)
 
 ```bash
-uv run quant-agent autopilot              # опрос досок → письма → формы; режим из apply.mode
-uv run quant-agent autopilot --once --mode dry_run   # один проход, формы заполняются без отправки
+uv run quant-agent autopilot              # один проход: опрос и оценка в фоне, формы подряд; режим из apply.mode
+uv run quant-agent autopilot --mode dry_run         # формы заполняются без отправки
 uv run quant-agent answers                # ответить на вопросы анкет, которых агент не знает
 uv run quant-agent apply <uid> --mode assist         # одна вакансия
 ```
@@ -65,7 +64,10 @@ uv run quant-agent apply <uid> --mode assist         # одна вакансия
   по IMAP (секция `mail`), вписывает код и снова жмёт Submit — и в `assist`, и в `auto`. Для Gmail нужен пароль
   приложения (myaccount.google.com/apppasswords) в `.env`: `IMAP_PASSWORD=…`. Проверка: `uv run quant-agent mail`.
   Пароля нет или письмо не пришло за `mail.code_wait_seconds` — уведомление, код вводите вы.
-- **Лимиты**: одна вакансия фирмы за проход, `max_applications` за `cooldown_months` на фирму, `apply.daily_limit`,
+- **Проход** — как autopilot в hh-agent: опрос досок, оценка и письма идут в фоне, а заявки подаются сразу из
+  очереди, одна за другой с паузой `apply.delay_seconds`; после каждой очередь пересчитывается. Очередь пуста и
+  оценка закончена — программа выходит. Повторять — запуском по расписанию (cron, launchd).
+- **Лимиты**: `max_applications` за `cooldown_months` на фирму, `apply.daily_limit`,
   `apply.max_per_run`, рабочие часы. Подаёт только на вакансии с баллом ≥ `apply.min_score` и с письмом.
 
 Workday и письма-алерты LinkedIn/eFC — следующие шаги. getmatch.ru — через Telegram-бота в hh-agent.

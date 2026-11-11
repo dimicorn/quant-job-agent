@@ -9,6 +9,7 @@
 from __future__ import annotations
 
 import random
+import threading
 from datetime import datetime
 from pathlib import Path
 
@@ -36,20 +37,23 @@ def in_hours(cfg: Config, t: datetime | None = None) -> bool:
     return a <= t.hour < b and not (cfg.apply.weekdays_only and t.weekday() >= 5)
 
 
-def candidates(cfg: Config, db: DB, firms: list[Firm]) -> list[dict]:
-    """Лучшая подходящая вакансия каждой фирмы, где лимит заявок ещё не исчерпан. По tier, потом по баллу."""
+def candidates(cfg: Config, db: DB, firms: list[Firm], skip: set[str] | None = None,
+               later: set[str] | None = None) -> list[dict]:
+    """Лучшая подходящая вакансия каждой фирмы, где лимит заявок ещё не исчерпан. По tier, потом по баллу.
+    skip — уже пробованные в этом проходе; later — фирмы, куда в этом проходе уже подали (идут в конце)."""
     by_name = {f.name: f for f in firms}
     rows = db.for_review(cfg.apply.min_score, {f.name: f.tier for f in firms})
     out, seen = [], set()
     for r in rows:
         f = by_name.get(r["firm"])
-        if r["ats"] not in APPLIERS or not r.get("letter") or r["firm"] in seen or f is None:
+        if (r["ats"] not in APPLIERS or not r.get("letter") or r["firm"] in seen or f is None
+                or r["uid"] in (skip or ())):
             continue
         if db.applications(f.name, f.cooldown_months) >= f.max_applications:
             continue
         seen.add(r["firm"])
         out.append(r)
-    return out
+    return sorted(out, key=lambda r: r["firm"] in (later or ()))  # sorted устойчив: внутри групп порядок тот же
 
 
 def prepare(cfg: Config, db: DB, row: dict) -> answers.Plan | None:
@@ -131,56 +135,87 @@ class Browser:
             self._ctx = None
 
 
-def run_once(cfg: Config, db: DB, browser: Browser, mode: str | None = None, poll: bool = True) -> int:
-    """Один проход. Вернуть число отправленных заявок."""
-    firms = load_firms(cfg)
-    if poll:
+def _produce(cfg: Config, firms: list[Firm], producing: threading.Event) -> None:
+    """Опрос досок, оценка и письма — в фоне, пока заявки подаются из очереди. Своё соединение с базой."""
+    try:
+        db = DB(cfg.path(cfg.db_path))
         watch.run_once(cfg, db, firms)
         materials.write_letters(cfg, db, min_score=cfg.apply.min_score)
-    sent, errors = 0, 0
-    for row in candidates(cfg, db, firms):
-        stop.check()
-        if not in_hours(cfg):
-            console.print(f"Вне рабочих часов {cfg.apply.active_hours} — заявки подожду.")
-            break
-        if db.applied_today() >= cfg.apply.daily_limit or sent >= cfg.apply.max_per_run:
-            console.print(f"Лимит: сегодня {db.applied_today()} из {cfg.apply.daily_limit}, за запуск {sent}.")
-            break
-        try:
-            plan = prepare(cfg, db, row)
-        except SourceError as e:
-            console.print(f"[red]Вопросы формы не получены[/] {row['firm']}: {e}")
-            continue
-        if plan is None:
-            continue
-        status = apply_one(cfg, db, browser.page(), row, plan, mode)
-        if status == "applied":
-            sent, errors = sent + 1, 0
-            if stop.wait(random.uniform(*cfg.apply.delay_seconds)):
+    except stop.Stopped:
+        pass
+    except Exception as e:  # noqa: BLE001 — заявки из уже готовой очереди продолжаются
+        console.print(f"[red]Опрос и оценка: {e}[/]")
+    finally:
+        producing.clear()
+
+
+def run_once(cfg: Config, db: DB, browser: Browser, mode: str | None = None, poll: bool = True) -> int:
+    """Один проход, как autopilot в hh-agent: опрос досок, оценка и письма идут в фоне, заявки подаются сразу из
+    очереди; после каждой заявки очередь пересчитывается (лимиты на фирму). Проход заканчивается, когда очередь
+    пуста и фон закончил, или по лимиту и рабочим часам. Вернуть число отправленных заявок."""
+    firms = load_firms(cfg)
+    producing = threading.Event()
+    bg = None
+    if poll:
+        producing.set()
+        bg = threading.Thread(target=_produce, args=(cfg, firms, producing), name="опрос-оценка", daemon=True)
+        bg.start()
+    sent, errors, tried, done_firms = 0, 0, set(), set()
+    try:
+        while not stop.requested():
+            if not in_hours(cfg):
+                console.print(f"Вне рабочих часов {cfg.apply.active_hours} — заявки подожду.")
                 break
-        elif status == "closed":
-            browser.close()  # следующая заявка откроет новое окно
-            if stop.wait(30):
+            if db.applied_today() >= cfg.apply.daily_limit or sent >= cfg.apply.max_per_run:
+                console.print(f"Лимит: сегодня {db.applied_today()} из {cfg.apply.daily_limit}, за запуск {sent}.")
                 break
-        elif status in ("error", "manual"):
-            errors += 1
-            if errors >= cfg.apply.max_consecutive_errors:
-                console.print("[red]Ошибки подряд — остановка: возможно, поменялась форма.[/]")
+            row = next(iter(candidates(cfg, db, firms, tried, done_firms)), None)
+            if row is None:
+                if producing.is_set():  # опрос и оценка ещё идут — подходящие вакансии могут появиться
+                    if stop.wait(15):
+                        break
+                    continue
                 break
+            tried.add(row["uid"])
+            try:
+                plan = prepare(cfg, db, row)
+            except SourceError as e:
+                console.print(f"[red]Вопросы формы не получены[/] {row['firm']}: {e}")
+                continue
+            if plan is None:
+                continue
+            status = apply_one(cfg, db, browser.page(), row, plan, mode)
+            if status == "applied":
+                sent, errors = sent + 1, 0
+                done_firms.add(row["firm"])
+                if stop.wait(random.uniform(*cfg.apply.delay_seconds)):
+                    break
+            elif status == "closed":
+                browser.close()  # следующая заявка откроет новое окно
+                if stop.wait(30):
+                    break
+            elif status in ("error", "manual"):
+                errors += 1
+                if errors >= cfg.apply.max_consecutive_errors:
+                    console.print("[red]Ошибки подряд — остановка: возможно, поменялась форма.[/]")
+                    break
+    finally:
+        if bg is not None and bg.is_alive() and not stop.requested():
+            console.print("Заявки на этот проход закончены — дожидаюсь оценки и писем…")
+            while bg.is_alive() and not stop.wait(1):
+                pass
     return sent
 
 
-def loop(cfg: Config, db: DB, mode: str | None = None, once: bool = False) -> None:
+def run(cfg: Config, db: DB, mode: str | None = None) -> int:
+    """Один проход и выход, как autopilot в hh-agent; повторять — запуском по расписанию. Вернуть число заявок."""
     browser = Browser(cfg)
+    sent = 0
     try:
-        while not stop.requested():
-            run_once(cfg, db, browser, mode)
-            if once:
-                break
-            console.print(f"Следующий опрос досок через {cfg.watch.every_minutes} мин. Ctrl+C — выход.")
-            if stop.wait(cfg.watch.every_minutes * 60):
-                break
+        sent = run_once(cfg, db, browser, mode)
+        console.print(f"Проход закончен: отправлено {sent}, сегодня {db.applied_today()} из {cfg.apply.daily_limit}.")
     except stop.Stopped:
         pass
     finally:
         browser.close()
+    return sent
