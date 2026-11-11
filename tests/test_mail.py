@@ -38,6 +38,15 @@ def test_parse_message_html():
     assert mail.extract_code(x.subject, x.body) == "dU9xKmLP"
 
 
+def test_parse_message_broken_charset():
+    # тема объявлена как gb2312, а байты — из gb18030 (так пишут китайские рассылки)
+    subj = "=?gb2312?B?" + __import__("base64").b64encode("测试 € 邮件".encode("gb18030")).decode() + "?="
+    data = (f"From: x@example.cn\r\nSubject: {subj}\r\nDate: Wed, 11 Nov 2026 10:00:00 +0300\r\n"
+            "Content-Type: text/plain; charset=gb2312\r\n\r\n").encode() + "正文 €".encode("gb18030")
+    x = mail.parse_message(data)
+    assert "邮件" in x.subject and "正文" in x.body
+
+
 def test_pick_code_fresh_and_firm_first():
     now = datetime.now(UTC)
     old = mail.Letter(now - timedelta(hours=1), "gh", "Security code for your application to Mako",

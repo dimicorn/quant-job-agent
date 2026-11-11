@@ -10,7 +10,7 @@ import imaplib
 import re
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
-from email.header import decode_header, make_header
+from email.header import decode_header
 from email.message import Message
 from email.utils import parsedate_to_datetime
 
@@ -55,8 +55,26 @@ def extract_code(subject: str, body: str) -> str | None:
     return None
 
 
+# кодировки, которые почтовики объявляют, а пишут в более широкой
+WIDER = {"gb2312": "gb18030", "gbk": "gb18030", "ks_c_5601-1987": "cp949", "iso-8859-1": "cp1252"}
+
+
+def _decode(data: bytes, charset: str | None) -> str:
+    cs = (charset or "utf-8").lower()
+    for c in (WIDER.get(cs, cs), "utf-8"):
+        try:
+            return data.decode(c)
+        except (LookupError, UnicodeDecodeError):
+            continue
+    return data.decode("utf-8", "replace")
+
+
 def _header(msg: Message, name: str) -> str:
-    return str(make_header(decode_header(msg.get(name, "") or "")))
+    """Заголовок по кускам: битая кодировка в одном письме не роняет разбор."""
+    out = []
+    for part, cs in decode_header(str(msg.get(name, "") or "")):
+        out.append(_decode(part, cs) if isinstance(part, bytes) else part)
+    return "".join(out).strip()
 
 
 def _body(msg: Message) -> str:
@@ -66,7 +84,7 @@ def _body(msg: Message) -> str:
         if ctype not in ("text/plain", "text/html") or part.get_filename():
             continue
         data = part.get_payload(decode=True) or b""
-        text = data.decode(part.get_content_charset() or "utf-8", "replace")
+        text = _decode(data, part.get_content_charset())
         if ctype == "text/plain" and not plain:
             plain = text
         elif ctype == "text/html" and not rich:
@@ -121,7 +139,10 @@ def recent(box: imaplib.IMAP4_SSL, folder: str, since: datetime, limit: int = 30
         _, parts = box.fetch(num, "(BODY.PEEK[])")
         raw = next((p[1] for p in parts if isinstance(p, tuple)), None)
         if raw:
-            out.append(parse_message(raw))
+            try:
+                out.append(parse_message(raw))
+            except Exception:  # noqa: BLE001 — одно странное письмо не мешает искать код в остальных
+                continue
     return out
 
 
