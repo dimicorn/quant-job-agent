@@ -1,6 +1,7 @@
 """HTTP без браузера: публичные API досок отвечают JSON без логина и капчи."""
 from __future__ import annotations
 
+import http.client
 import json
 import urllib.error
 import urllib.request
@@ -20,7 +21,7 @@ def get(url: str, timeout: float = 30) -> bytes:
             return r.read()
     except urllib.error.HTTPError as e:
         raise SourceError(f"HTTP {e.code} {url}")
-    except (urllib.error.URLError, TimeoutError, OSError) as e:
+    except (urllib.error.URLError, http.client.HTTPException, TimeoutError, OSError) as e:
         raise SourceError(f"{type(e).__name__}: {e} ({url})")
 
 
@@ -33,7 +34,7 @@ def post_json(url: str, payload: Any, timeout: float = 30) -> Any:
             return json.loads(r.read())
     except urllib.error.HTTPError as e:
         raise SourceError(f"HTTP {e.code} {url}")
-    except (urllib.error.URLError, TimeoutError, OSError) as e:
+    except (urllib.error.URLError, http.client.HTTPException, TimeoutError, OSError) as e:
         raise SourceError(f"{type(e).__name__}: {e} ({url})")
     except ValueError:
         raise SourceError(f"не JSON: {url}")

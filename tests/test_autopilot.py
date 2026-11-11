@@ -115,3 +115,29 @@ def test_run_once_applies_what_background_poll_finds(cfg, db, monkeypatch):
     monkeypatch.setattr(autopilot, "apply_one", _fake_apply(applied))
     assert autopilot.run_once(cfg, db, NoBrowser()) == 1
     assert applied == ["greenhouse:imc:7"]
+
+
+def test_run_once_no_race_when_background_finishes_during_queue_check(cfg, db, monkeypatch):
+    """Фон дописал вакансию и закончил, пока считалась пустая очередь: проход не должен выйти, не подав её."""
+    cfg.apply.min_score, cfg.apply.daily_limit = 80, 10
+    cfg.apply.delay_seconds, cfg.apply.active_hours = (0, 0), (0, 24)
+    monkeypatch.setattr(autopilot, "load_firms", lambda cfg: FIRMS)
+    monkeypatch.setattr(autopilot, "prepare", lambda cfg, db, row: Plan([], []))
+    monkeypatch.setattr(autopilot.stop, "wait", lambda s: False)
+    monkeypatch.setattr(autopilot.watch, "run_once", lambda cfg, pdb, firms: add(pdb, "greenhouse:imc:8", "IMC", 90))
+    monkeypatch.setattr(autopilot.materials, "write_letters", lambda *a, **k: None)
+    real, calls = autopilot.candidates, []
+
+    def slow_first(*a, **k):
+        calls.append(1)
+        if len(calls) == 1:  # очередь посчитана до записи фона, а фон закончил, пока мы её возвращали
+            out = [r for r in real(*a, **k) if r["uid"] != "greenhouse:imc:8"]
+            while any(t.name == "опрос-оценка" for t in __import__("threading").enumerate()):
+                __import__("time").sleep(0.01)
+            return out
+        return real(*a, **k)
+    monkeypatch.setattr(autopilot, "candidates", slow_first)
+    applied = []
+    monkeypatch.setattr(autopilot, "apply_one", _fake_apply(applied))
+    assert autopilot.run_once(cfg, db, NoBrowser()) == 1
+    assert applied == ["greenhouse:imc:8"]

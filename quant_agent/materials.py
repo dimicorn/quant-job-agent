@@ -8,6 +8,7 @@ PDF резюме — из Markdown через Chromium (Playwright). Затем 
 (pdfminer), как это делают ATS, и в нём должны найтись имя, почта и разделы в правильном порядке."""
 from __future__ import annotations
 
+import html as _html
 import re
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
@@ -217,7 +218,7 @@ def build_letter_pdf(cfg: Config, row: dict, out: Path | None = None) -> Path:
     """Письмо отдельным PDF — для форм, где письмо загружают файлом."""
     safe = re.sub(r"[^\w-]+", "-", f"{row['firm']}-{row['ext_id']}").strip("-")
     out = out or cfg.path(f"materials/letters/{safe}.pdf")
-    paras = "".join(f"<p>{p.strip()}</p>" for p in (row.get("letter") or "").split("\n\n") if p.strip())
+    paras = "".join(f"<p>{_html.escape(p.strip())}</p>" for p in (row.get("letter") or "").split("\n\n") if p.strip())
     html = (f"<!doctype html><html><head><meta charset='utf-8'><style>{CSS} p {{ margin: 0 0 8pt; font-size: 10.5pt; }}"
             f"</style></head><body>{paras}</body></html>")
     return render_pdf(html, out)

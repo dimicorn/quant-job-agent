@@ -130,19 +130,31 @@ def connect(cfg: Config) -> imaplib.IMAP4_SSL:
     return box
 
 
-def recent(box: imaplib.IMAP4_SSL, folder: str, since: datetime, limit: int = 30) -> list[Letter]:
-    """Письма папки с даты since (IMAP ищет по дням — точнее отсекает pick_code), новые первыми."""
+def recent(box: imaplib.IMAP4_SSL, folder: str, since: datetime, limit: int = 30,
+           cache: dict | None = None) -> list[Letter]:
+    """Письма папки с даты since (IMAP ищет по дням — точнее отсекает pick_code), новые первыми.
+    cache — уже разобранные письма (папка, номер) → Letter: при ожидании кода не качать их заново."""
     box.select(f'"{folder}"', readonly=True)
     _, data = box.search(None, f'(SINCE "{since.astimezone(UTC):%d-%b-%Y}")')
     out = []
     for num in reversed((data[0] or b"").split()[-limit:]):
+        key = (folder, num)
+        if cache is not None and key in cache:
+            if cache[key] is not None:
+                out.append(cache[key])
+            continue
         _, parts = box.fetch(num, "(BODY.PEEK[])")
         raw = next((p[1] for p in parts if isinstance(p, tuple)), None)
+        letter = None
         if raw:
             try:
-                out.append(parse_message(raw))
+                letter = parse_message(raw)
             except Exception:  # noqa: BLE001 — одно странное письмо не мешает искать код в остальных
-                continue
+                pass
+        if letter is not None:
+            out.append(letter)
+        if cache is not None:
+            cache[key] = letter
     return out
 
 
@@ -152,9 +164,10 @@ def wait_code(cfg: Config, since: datetime, hint: str = "", timeout: float | Non
     since = since - timedelta(seconds=60)  # часы почтового сервера могут отставать
     end = datetime.now(UTC) + timedelta(seconds=timeout)
     box = connect(cfg)
+    cache: dict = {}
     try:
         while True:
-            letters = [x for f in cfg.mail.folders for x in recent(box, f, since)]
+            letters = [x for f in cfg.mail.folders for x in recent(box, f, since, cache=cache)]
             code = pick_code(letters, since, hint)
             if code or datetime.now(UTC) >= end or stop.wait(5):
                 return code

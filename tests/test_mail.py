@@ -73,6 +73,7 @@ class FakeIMAP:
 
     def fetch(self, num, what):
         assert "PEEK" in what  # письма остаются непрочитанными
+        self.fetched = getattr(self, "fetched", 0) + 1
         return "OK", [(b"1 (BODY[] {1})", self.messages[int(num) - 1]), b")"]
 
     def noop(self):
@@ -88,6 +89,24 @@ def test_wait_code(cfg, monkeypatch):
     monkeypatch.setattr(mail, "connect", lambda c: box)
     assert mail.wait_code(cfg, datetime.now(UTC), "Jane Street", timeout=30) == "dU9xKmLP"
     assert box.calls == 2
+
+
+def test_wait_code_fetches_each_letter_once(cfg, monkeypatch):
+    """Пока ждём код, старые письма не качаются заново на каждом круге."""
+    monkeypatch.setattr(mail.stop, "wait", lambda s: False)
+    old = raw("Weekly digest", "nothing here", datetime.now(UTC) - timedelta(hours=1))
+    box = FakeIMAP([old, old])
+    box.search = lambda charset, query: ("OK", [b"1 2"])
+    monkeypatch.setattr(mail, "connect", lambda c: box)
+    t = iter([datetime.now(UTC)] * 4 + [datetime.now(UTC) + timedelta(hours=1)] * 10)
+
+    class Clock(datetime):
+        @classmethod
+        def now(cls, tz=None):
+            return next(t)
+    monkeypatch.setattr(mail, "datetime", Clock)
+    assert mail.wait_code(cfg, datetime.now(UTC), timeout=30) is None
+    assert box.fetched == 2
 
 
 def test_configured(cfg, monkeypatch, tmp_path):

@@ -1,6 +1,6 @@
 """Автопилот: опрос досок → оценка → письма → план ответов → заполнение формы Greenhouse → (Submit).
 
-Один проход (run_once) и цикл (loop) с опросом досок раз в watch.every_minutes. Ограничения:
+Один проход за запуск (run): опрос и оценка в фоне, заявки сразу из очереди; повтор — по расписанию. Ограничения:
   - формы Greenhouse, Lever и Ashby (APPLIERS), балл ≥ apply.min_score, есть письмо;
   - не больше одной заявки в фирму за проход и не больше max_applications за cooldown_months;
   - apply.daily_limit в сутки, apply.max_per_run за запуск, рабочие часы apply.active_hours;
@@ -169,9 +169,10 @@ def run_once(cfg: Config, db: DB, browser: Browser, mode: str | None = None, pol
             if db.applied_today() >= cfg.apply.daily_limit or sent >= cfg.apply.max_per_run:
                 console.print(f"Лимит: сегодня {db.applied_today()} из {cfg.apply.daily_limit}, за запуск {sent}.")
                 break
+            busy = producing.is_set()  # до запроса очереди: фон мог закончить, пока мы её считали
             row = next(iter(candidates(cfg, db, firms, tried, done_firms)), None)
             if row is None:
-                if producing.is_set():  # опрос и оценка ещё идут — подходящие вакансии могут появиться
+                if busy:  # опрос и оценка ещё шли — подходящие вакансии могли появиться
                     if stop.wait(15):
                         break
                     continue

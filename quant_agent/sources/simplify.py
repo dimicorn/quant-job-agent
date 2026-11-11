@@ -25,6 +25,8 @@ def _key(name: str) -> str:
 def match_firm(company: str, firms: list) -> Any | None:
     """Фирма из firms.yaml по названию из списка: «Five Rings Capital» → Five Rings, «XTX Markets» → XTX Markets."""
     c = _key(company)
+    if not c:  # иначе "".startswith → первая фирма списка
+        return None
     for f in firms:
         k = _key(f.name)
         if k and (c == k or c.startswith(k) or k.startswith(c)):

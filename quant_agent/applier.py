@@ -12,6 +12,7 @@ import random
 import re
 from concurrent.futures import ThreadPoolExecutor
 from datetime import UTC, datetime
+from html import escape
 from pathlib import Path
 
 from . import mail, stop
@@ -103,7 +104,7 @@ class FormApplier:
     def _letter_pdf(self, text: str, files_dir: Path) -> str:
         """Письмо в поле-файле — отдельный PDF."""
         from .materials import render_pdf, to_html
-        html = to_html(text.replace("\n", "\n\n"))
+        html = to_html(escape(text).replace("\n", "\n\n"))  # «<», «&» в письме — текст, не разметка
         # второй sync Playwright нельзя запустить в потоке, где уже работает браузер формы
         with ThreadPoolExecutor(1) as ex:
             return str(ex.submit(render_pdf, html, files_dir / "cover_letter.pdf").result())
@@ -204,11 +205,14 @@ class FormApplier:
                     problems.append(f"«{s.label[:60]}»: текст не совпал ({len(got)} из {len(s.value[0])} символов)")
         return problems
 
-    def screenshot(self, name: str) -> Path:
+    def screenshot(self, name: str) -> Path | str:
         safe = re.sub(r"[^\w-]+", "-", name)[:60]
         out = self.cfg.path(f"debug/{datetime.now():%Y%m%d-%H%M%S}-{safe}.png")
         out.parent.mkdir(parents=True, exist_ok=True)
-        self.page.screenshot(path=str(out), full_page=True)
+        try:
+            self.page.screenshot(path=str(out), full_page=True)
+        except Exception:  # noqa: BLE001 — окно закрыли: снимка нет, но заявка не должна ронять проход
+            return "нет (окно закрыто)"
         return out
 
     def confirmed(self) -> bool:

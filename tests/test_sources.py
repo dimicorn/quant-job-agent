@@ -175,3 +175,11 @@ def test_simplify_parse_maps_to_firm_boards():
 def test_detect_greenhouse_embed():
     assert detect("https://boards.greenhouse.io/embed/job_app?token=8010307") == ("greenhouse", "", "8010307")
     assert detect("https://job-boards.greenhouse.io/embed/job_app?for=mako&token=1") == ("greenhouse", "mako", "1")
+
+
+def test_match_firm_empty_name():
+    """Пустое название компании не должно совпадать с первой фирмой списка."""
+    from quant_agent.firms import Firm
+    from quant_agent.sources import simplify
+    firms = [Firm(name="Optiver", ats="greenhouse", token="o"), Firm(name="Five Rings", ats="greenhouse", token="f")]
+    assert simplify.match_firm("", firms) is None and simplify.match_firm("  ", firms) is None

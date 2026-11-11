@@ -88,11 +88,13 @@ _ENROLLED = re.compile(
     r"returning to (school|university|your studies)|enrolled (in|at) an? (accredited |full[- ]time )?(degree|university|"
     r"bachelor|master|ph\.?d|program)|penultimate[- ]year|must be a (current )?student|current (university )?students?\b",
     re.I)
-# «Graduate … (2027 Start)» — год начала работы, а не выпуска: нужен глагол или «class of».
+# «Graduate … (2027 Start)», «join the graduate programme in June 2027» — год начала работы, а не выпуска:
+# нужен глагол («to graduate in 2027», «graduate by 2028») или «class of».
 # Диапазоны: «2027 or 2028», «between May 2025 and February 2028», «Fall 2027 and Summer 2028»;
 # «by 2027» — не позже; «2024 or later» — не раньше.
 _GRAD_YEARS = re.compile(
-    r"(?:graduating|graduation|graduated|graduate|class of|degree completion|complet\w* (?:your|their|a) degree)"
+    r"(?:graduating|graduation|graduated|graduate(?=\s+(?:in|by|before|between|from|after|during|no|prior|until)\b)"
+    r"|class of|degree completion|complet\w* (?:your|their|a) degree)"
     r"(?P<gap>[^.\n]{0,60}?)(?P<lo>20\d\d)"
     r"(?:\s*(?:-|–|—|or|and|to|through|until)\s*(?:[A-Za-z]+\.?\s+)?(?P<hi>20\d\d))?"
     r"(?P<later>\s*(?:or|and) (?:later|after|beyond))?", re.I)

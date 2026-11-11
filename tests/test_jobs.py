@@ -55,6 +55,10 @@ E = Eligibility(enrolled=False, graduation_year=2026, needs_sponsorship=True, re
     ("graduate", "an expected graduation date between Fall 2027 and Summer 2028.", "2027–2028"),
     ("graduate", "Graduated in 2024 or later.", None),
     ("graduate", "You must have graduated by 2025.", "не позже 2025"),
+    ("graduate", "Planning to graduate in 2027 or 2028, all backgrounds are welcome!", "2027–2028"),
+    # SIG и Barclays: год начала программы, а не выпуска
+    ("graduate", "You should be available to join the graduate programme in June 2027.", None),
+    ("graduate", "jobs/Quantitative-Analytics-Associate-Graduate-Programme-2027-London_JR-0000124678", None),
     ("internship", "Graduating year of 2028", "2028"),
     ("graduate", "We are unable to sponsor visas for this role.", "визу"),
     ("graduate", "Applicants must have the right to work in the UK.", "визу"),
