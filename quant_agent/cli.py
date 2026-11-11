@@ -183,6 +183,11 @@ def cmd_add(cfg: Config, args) -> int:
                   kind=kind, url=job.url, apply_url=job.apply_url, department=job.department, description=job.description,
                   compensation=job.compensation, published_at=job.published_at)
     db.seen(job.uid, **fields)
+    row = db.get(job.uid)
+    if row["status"] in APPLIED:  # заявка уже подана: статус не трогаем, иначе автопилот подаст повторно
+        show(cfg, row)
+        console.print(f"Заявка уже подана: статус {row['status']}.")
+        return 0
     reason = eligibility(job, kind, cfg.eligibility)  # фильтры не применяем: ссылку дали явно
     if reason:
         db.update(job.uid, status="ineligible", filter_reason=reason)
@@ -226,7 +231,10 @@ def _ask(m: dict) -> str | list[str] | None:
         if not raw:
             return None
         try:
-            picked = [m["options"][int(x) - 1] for x in raw.replace(" ", "").split(",")]
+            nums = [int(x) for x in raw.replace(" ", "").split(",")]
+            if not all(1 <= n <= len(m["options"]) for n in nums):
+                raise IndexError
+            picked = [m["options"][n - 1] for n in nums]
         except (ValueError, IndexError):
             console.print("[red]Нет такого номера — пропускаю.[/]")
             return None
@@ -247,7 +255,7 @@ def cmd_answers(cfg: Config, args) -> int:
     if not rows:
         console.print("Вопросов без ответа нет.")
         return 0
-    asked: set[str] = set()
+    asked: set[tuple] = set()   # (вопрос, варианты): тот же текст с другими вариантами спрашивается заново
     for row in rows:
         console.rule(f"{row['firm']} — {row['title']} ({row['score']})")
         plan = ans.Plan.from_json(row["plan"]) if row.get("plan") else None
@@ -255,12 +263,13 @@ def cmd_answers(cfg: Config, args) -> int:
             if m["why"].startswith("нет profile.") or m["why"].startswith("нет файла"):
                 console.print(f"[yellow]{m['label']}: {m['why']} — заполните config.yaml[/]")
                 continue
-            if ans.norm(m["label"]) in asked:
+            key = (ans.norm(m["label"]), tuple(m["options"]))
+            if key in asked:
                 continue
             value = _ask(m)
             if value is not None:
-                ans.save_answer(cfg, m["label"], value)
-                asked.add(ans.norm(m["label"]))
+                ans.save_answer(cfg, m["label"], value, firm=row["firm"])
+                asked.add(key)
         db.update(row["uid"], status="scored", error=None)
         if prepare(cfg, db, db.get(row["uid"])) is not None:
             console.print("[green]Все ответы есть — вакансия вернулась в очередь автопилота.[/]")

@@ -63,10 +63,25 @@ def load_answers(cfg: Config) -> dict[str, str | list[str]]:
     return {norm(k): v for k, v in data.items()}
 
 
-def save_answer(cfg: Config, label: str, value: str | list[str]) -> None:
-    """Дописать ответ в answers.yaml (ключ — исходный текст вопроса, его легко найти и поправить руками)."""
+def firm_key(firm: str, label: str) -> str:
+    """Ключ ответа только для одной фирмы: «Marshall Wace: How did you hear about us?»."""
+    return f"{firm}: {label}"
+
+
+def lookup(answers: dict, firm: str, label: str):
+    """Ответ фирмы важнее общего: варианты одного и того же вопроса у фирм разные."""
+    hit = answers.get(norm(firm_key(firm, label)))
+    return hit if hit is not None else answers.get(norm(label))
+
+
+def save_answer(cfg: Config, label: str, value: str | list[str], firm: str | None = None) -> None:
+    """Дописать ответ в answers.yaml (ключ — исходный текст вопроса, его легко найти и поправить руками).
+    Если общий ответ на этот вопрос уже есть, но не подошёл (у фирмы другие варианты), — ответ сохраняется
+    только для этой фирмы и общий не затирается."""
     p: Path = cfg.path(cfg.apply.answers_file)
     data = (yaml.safe_load(p.read_text(encoding="utf-8")) or {}) if p.exists() else {}
+    if firm and any(norm(k) == norm(label) for k in data):
+        label = firm_key(firm, label)
     data = {k: v for k, v in data.items() if norm(k) != norm(label)}
     data[" ".join(label.replace("*", "").split())] = value
     header = ("# Ваши ответы на вопросы анкет (quant-agent answers). Ключ — текст вопроса, значение — вариант из\n"
@@ -182,7 +197,7 @@ def plan(cfg: Config, row: dict, fields: list[Field], use_llm: bool = True) -> P
             if getattr(pr, link):
                 p.steps.append(Step(f.id, f.label, kind, [getattr(pr, link)], "profile"))
             continue
-        known = answers.get(norm(f.label))
+        known = lookup(answers, row["firm"], f.label)
         if known is not None:
             vals = _match_options(known, f.options) if f.is_select else [str(known)]
             if vals:

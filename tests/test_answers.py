@@ -98,6 +98,24 @@ def test_saved_answer_is_reused_and_plan_roundtrip(cfg, tmp_path, monkeypatch):
     assert "Please confirm the region" in cfg.path("answers.yaml").read_text(encoding="utf-8")
 
 
+def test_same_question_other_options_saved_per_firm(cfg, tmp_path, monkeypatch):
+    """Настоящий случай: «How did you hear about us?» у Pinely и Marshall Wace с разными вариантами.
+    Общий ответ не подходит MW — ответ MW сохраняется только для MW и общий не затирает."""
+    setup_profile(cfg, tmp_path)
+    fake_llm(monkeypatch, {})
+    label = "How did you hear about us?"
+    pinely = Field("q1", label, True, "multi_value_single_select", ["Online Job boards", "Friends"])
+    mw = Field("q2", label, True, "multi_value_single_select", ["GitHub", "Search engine (Google, Yahoo, etc.)"])
+    row_mw = {**ROW, "firm": "Marshall Wace"}
+    answers.save_answer(cfg, label, "Online Job boards", firm="Pinely")
+    assert answers.plan(cfg, row_mw, [mw]).missing
+    answers.save_answer(cfg, label, "Search engine (Google, Yahoo, etc.)", firm="Marshall Wace")
+    assert answers.plan(cfg, row_mw, [mw]).steps[0].value == ["Search engine (Google, Yahoo, etc.)"]
+    assert answers.plan(cfg, {**ROW, "firm": "Pinely"}, [pinely]).steps[0].value == ["Online Job boards"]
+    text = cfg.path("answers.yaml").read_text(encoding="utf-8")
+    assert "Marshall Wace: How did you hear about us?" in text and "Online Job boards" in text
+
+
 def test_consent_needs_setting(cfg, tmp_path, monkeypatch):
     setup_profile(cfg, tmp_path)
     cfg.apply.auto_consent = False
