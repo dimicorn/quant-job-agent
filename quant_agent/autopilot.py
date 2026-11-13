@@ -9,6 +9,7 @@
 from __future__ import annotations
 
 import random
+import re
 import threading
 from datetime import datetime
 from pathlib import Path
@@ -70,6 +71,27 @@ def prepare(cfg: Config, db: DB, row: dict) -> answers.Plan | None:
     return plan
 
 
+# Страница формы есть, а формы нет: фирма удалила вакансию или ушла с этой ATS (Pinely: Ashby → Workable,
+# а API Ashby ещё отдаёт старые вакансии)
+GONE = re.compile(r"page not found|page you requested was not found|no longer (?:available|accepting)|"
+                  r"job (?:has been|was) (?:closed|filled|removed)|position (?:has been|is) (?:closed|filled)|\b404\b", re.I)
+
+
+def _not_opened(db: DB, page, row: dict, title: str, e: Exception) -> str:
+    """Форма не открылась. Удалена — статус gone (опрос доски его не вернёт); иначе сеть — вакансия остаётся
+    в очереди до следующего прохода."""
+    try:
+        text = page.locator("body").inner_text(timeout=3000)
+    except PlaywrightError:
+        text = ""
+    if GONE.search(text):
+        db.update(row["uid"], status="gone", error=f"формы нет на сайте: {page.url}", decided_at=now())
+        console.print(f"[yellow]→ gone[/] {title}: формы нет на сайте ({page.url}) — фирма убрала вакансию или сменила ATS")
+        return "gone"
+    console.print(f"[yellow]Форма не открылась[/] {title}: {str(e).splitlines()[0][:150]} — попробую в следующий проход")
+    return "retry"
+
+
 def apply_one(cfg: Config, db: DB, page, row: dict, plan: answers.Plan, mode: str | None = None) -> str:
     title = f"{row['firm']} — {row['title']}"
     console.print(f"Заполняю: {title} ({row['score']})")
@@ -79,7 +101,12 @@ def apply_one(cfg: Config, db: DB, page, row: dict, plan: answers.Plan, mode: st
     files = Path(cfg.path("materials/tmp"))
     files.mkdir(parents=True, exist_ok=True)
     try:
-        ap.open(source.form_url(row["token"], row["ext_id"]))
+        try:
+            ap.open(source.form_url(row["token"], row["ext_id"]))
+        except PlaywrightError as e:
+            if page.is_closed():
+                raise
+            return _not_opened(db, page, row, title, e)
         ap.fill(plan, files)
         problems = ap.verify(plan)
         if problems:
@@ -195,7 +222,7 @@ def run_once(cfg: Config, db: DB, browser: Browser, mode: str | None = None, pol
                 browser.close()  # следующая заявка откроет новое окно
                 if stop.wait(30):
                     break
-            elif status in ("error", "manual"):
+            elif status in ("error", "manual", "retry"):
                 errors += 1
                 if errors >= cfg.apply.max_consecutive_errors:
                     console.print("[red]Ошибки подряд — остановка: возможно, поменялась форма.[/]")

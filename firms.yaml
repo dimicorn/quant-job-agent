@@ -56,7 +56,9 @@ firms:
 
   # ── Русскоязычные команды: реально попасть из РФ, много выпускников ШАДа и МФТИ ──
   # Берём и обычные junior-позиции, не только стажировки (kinds).
-  - {name: Pinely, ats: ashby, token: pinely, tier: 1, kinds: [internship, graduate, full_time]}
+  # Pinely в ноябре 2026 ушла с Ashby на Workable (apply.workable.com/pinely): API Ashby ещё отдаёт старые
+  # вакансии, но их страниц и форм уже нет. Вернуть, когда агент научится Workable.
+  # - {name: Pinely, ats: workable, token: pinely, tier: 1, kinds: [internship, graduate, full_time]}
   - {name: Teza Technologies, ats: ashby, token: teza-technologies, tier: 1, kinds: [internship, graduate, full_time]}
   - {name: Alber Blanc, ats: site, token: "https://alberblanc.com/careers/", links: "^/careers/[^/]+/?$", tier: 1,
      kinds: [internship, graduate, full_time]}

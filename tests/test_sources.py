@@ -183,3 +183,29 @@ def test_match_firm_empty_name():
     from quant_agent.sources import simplify
     firms = [Firm(name="Optiver", ats="greenhouse", token="o"), Firm(name="Five Rings", ats="greenhouse", token="f")]
     assert simplify.match_firm("", firms) is None and simplify.match_firm("  ", firms) is None
+
+
+def test_http_retries_transient_errors(monkeypatch):
+    """Сеть мигнула: обрыв соединения — повтор, а не ошибка доски; 404 — сразу ошибка."""
+    import io
+    import urllib.error
+
+    from quant_agent.sources import http
+    monkeypatch.setattr(http.stop, "wait", lambda s: False)
+    calls = []
+
+    def flaky(req, timeout):
+        calls.append(req.full_url)
+        if len(calls) < 3:
+            raise ConnectionResetError(54, "Connection reset by peer")
+        return io.BytesIO(b'{"jobs": []}')
+    monkeypatch.setattr(http.urllib.request, "urlopen", flaky)
+    assert http.get_json("https://boards-api.greenhouse.io/v1/boards/x/jobs") == {"jobs": []}
+    assert len(calls) == 3
+
+    calls.clear()
+    monkeypatch.setattr(http.urllib.request, "urlopen", lambda req, timeout: (calls.append(1), (_ for _ in ()).throw(
+        urllib.error.HTTPError(req.full_url, 404, "nf", {}, None)))[1])
+    with pytest.raises(SourceError, match="HTTP 404"):
+        http.get("https://boards-api.greenhouse.io/v1/boards/nope/jobs")
+    assert len(calls) == 1

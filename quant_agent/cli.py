@@ -16,7 +16,7 @@ from .jobs import classify_kind, eligibility
 from .log import console
 from .sources import SOURCES, SourceError, detect, fetch_url
 
-STATUSES = ("new", "filtered", "ineligible", "scored", "needs_answers", "skipped", "manual", "error", "closed", *APPLIED)
+STATUSES = ("new", "filtered", "ineligible", "scored", "needs_answers", "skipped", "manual", "error", "closed", "gone", *APPLIED)
 TRACKS = {"qr": "quant research", "qd": "quant dev", "infra": "ML infra / data", "other": "другое"}
 LEVEL = {"supported": "[green]●[/]", "partial": "[yellow]◐[/]", "unknown": "[dim]○[/]"}
 

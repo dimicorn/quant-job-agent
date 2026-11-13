@@ -65,3 +65,35 @@ def test_closed_browser_keeps_job_in_queue(page, fast, db):
     plan = Plan([Step("question_1", "University", "text", ["MIPT"], "llm")])
     assert autopilot.apply_one(fast, db, page, row, plan, "assist") == "closed"
     assert db.get(uid)["status"] == "scored"
+
+
+ASHBY_404 = "<html><body><h1>Page not found</h1><p>The page you requested was not found</p></body></html>"
+
+
+def _ashby_job(db):
+    uid = "ashby:pinely:1"
+    db.seen(uid, firm="Pinely", ats="ashby", token="pinely", ext_id="1", title="Middle QR", status="scored")
+    db.update(uid, status="scored")
+    return uid, {**db.get(uid), "score": 82}
+
+
+def test_removed_form_is_gone_and_not_returned_by_poll(page, fast, db, monkeypatch):
+    """Настоящий случай Pinely: API Ashby ещё отдаёт вакансию, а страница формы — «Page not found»."""
+    page.route("https://jobs.ashbyhq.com/**", lambda r: r.fulfill(status=404, content_type="text/html", body=ASHBY_404))
+    monkeypatch.setattr(autopilot.AshbyApplier, "open", lambda self, url: (
+        self.page.goto(url), self.page.locator(self.READY).first.wait_for(timeout=500)))
+    uid, row = _ashby_job(db)
+    assert autopilot.apply_one(fast, db, page, row, Plan([]), "auto") == "gone"
+    assert db.get(uid)["status"] == "gone"
+    db.seen(uid)  # вакансия всё ещё в API доски — статус не возвращается
+    assert db.get(uid)["status"] == "gone"
+
+
+def test_form_not_loaded_stays_in_queue(page, fast, db, monkeypatch):
+    """Сеть мигнула — формы нет, но и «not found» нет: вакансия остаётся в очереди."""
+    page.route("https://jobs.ashbyhq.com/**", lambda r: r.fulfill(content_type="text/html", body="<html><body></body></html>"))
+    monkeypatch.setattr(autopilot.AshbyApplier, "open", lambda self, url: (
+        self.page.goto(url), self.page.locator(self.READY).first.wait_for(timeout=500)))
+    uid, row = _ashby_job(db)
+    assert autopilot.apply_one(fast, db, page, row, Plan([]), "auto") == "retry"
+    assert db.get(uid)["status"] == "scored"

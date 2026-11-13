@@ -4,7 +4,8 @@
   new → filtered (локальный фильтр) | ineligible (условия допуска или виза) | scored (оценил LLM)
   scored → needs_answers (в анкете вопросы для вас) → scored
   scored → skipped | manual | error | applied (→ oa → interview → offer | rejected)
-  closed — вакансия пропала с доски фирмы до того, как вы подали заявку."""
+  closed — вакансия пропала с доски фирмы до того, как вы подали заявку;
+  gone — на доске вакансия есть, а формы на сайте нет (фирма убрала её или сменила ATS)."""
 from __future__ import annotations
 
 import json
