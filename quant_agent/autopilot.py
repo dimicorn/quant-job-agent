@@ -1,7 +1,7 @@
 """Автопилот: опрос досок → оценка → письма → план ответов → заполнение формы Greenhouse → (Submit).
 
 Один проход за запуск (run): опрос и оценка в фоне, заявки сразу из очереди; повтор — по расписанию. Ограничения:
-  - формы Greenhouse, Lever и Ashby (APPLIERS), балл ≥ apply.min_score, есть письмо;
+  - формы Greenhouse, Lever, Ashby и Workable (APPLIERS), балл ≥ apply.min_score, есть письмо;
   - не больше одной заявки в фирму за проход и не больше max_applications за cooldown_months;
   - apply.daily_limit в сутки, apply.max_per_run за запуск, рабочие часы apply.active_hours;
   - вопросы анкеты без ответа → needs_answers: отвечаете один раз (quant-agent answers), ответ запоминается.
@@ -20,16 +20,17 @@ from . import answers, materials, stop, watch
 from .applier import BrowserClosed, FormError, GreenhouseApplier
 from .applier_ashby import AshbyApplier
 from .applier_lever import LeverApplier
+from .applier_workable import WorkableApplier
 from .config import Config
 from .db import DB, now
 from .events import log_event
 from .firms import Firm, load_firms
 from .log import console
-from .sources import SourceError, ashby, greenhouse, lever
+from .sources import SourceError, ashby, greenhouse, lever, workable
 
 # площадка → (модуль с questions() и form_url(), класс заполнения формы)
 APPLIERS = {"greenhouse": (greenhouse, GreenhouseApplier), "lever": (lever, LeverApplier),
-            "ashby": (ashby, AshbyApplier)}
+            "ashby": (ashby, AshbyApplier), "workable": (workable, WorkableApplier)}
 
 
 def in_hours(cfg: Config, t: datetime | None = None) -> bool:

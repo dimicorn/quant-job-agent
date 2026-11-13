@@ -14,7 +14,7 @@ from .events import log_event
 from .firms import Firm, load_firms
 from .jobs import Job, classify_kind, eligibility, prefilter
 from .log import console
-from .sources import SOURCES, SourceError, fetch_firm, parse_page, simplify
+from .sources import API_ATS, SOURCES, SourceError, fetch_firm, parse_page, simplify
 from .sources.http import get
 
 MAX_SEPARATE = 3  # больше новых подходящих вакансий за опрос — одно сводное уведомление
@@ -81,14 +81,14 @@ def notify(title: str, text: str) -> None:
 def _details(job: Job) -> bool:
     """Дочитать текст вакансии из списка-агрегатора. False — вакансия уже закрыта на доске фирмы."""
     try:
-        if job.ats in ("greenhouse", "lever", "ashby"):
+        if job.ats in API_ATS:
             full = SOURCES[job.ats].fetch_one(job.firm, job.token, job.ext_id)
             job.description, job.department = full.description, full.department
             job.compensation = job.compensation or full.compensation
         else:
             job.description = parse_page(get(job.url).decode("utf-8", "replace"), job.url).description
     except SourceError:
-        return job.ats not in ("greenhouse", "lever", "ashby")  # своя страница не открылась — оценим по названию
+        return job.ats not in API_ATS  # своя страница не открылась — оценим по названию
     return True
 
 

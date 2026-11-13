@@ -3,7 +3,7 @@ New-Grad-Positions). Берём машиночитаемый .github/scripts/lis
 ссылка на ATS, локации и признак «вакансия ещё открыта».
 
 Ссылка ведёт на ATS фирмы. Если это Greenhouse / Lever / Ashby и фирма есть в firms.yaml, вакансия получает
-тот же uid, что и при опросе доски фирмы: дублей нет, автопилот подаёт как обычно. Остальное (Workday, iCIMS,
+тот же uid, что и при опросе доски фирмы (и Workable): дублей нет, автопилот подаёт как обычно. Остальное (Workday, iCIMS,
 свои сайты) — ats «page»: оценка и письмо будут, откликаться вручную."""
 from __future__ import annotations
 
@@ -42,7 +42,7 @@ def _clean(url: str) -> str:
 
 
 def parse(data: Any, firms: list, kind_hint: str) -> list[Job]:
-    from . import detect  # здесь, чтобы не было циклического импорта
+    from . import API_ATS, detect  # здесь, чтобы не было циклического импорта
     if not isinstance(data, list):
         raise SourceError("simplify: listings.json — не список")
     out = []
@@ -55,7 +55,7 @@ def parse(data: Any, firms: list, kind_hint: str) -> list[Job]:
         ats, token, ext_id = hit if hit else ("", "", "")
         if ats and not token and firm is not None and firm.ats == ats:
             token = firm.token  # ссылка без имени доски (…/embed/job_app?token=…, gh_jid на сайте фирмы)
-        if not (ats in ("greenhouse", "lever", "ashby") and token and ext_id):
+        if not (ats in API_ATS and token and ext_id):
             ats, token, ext_id = "page", urlparse(url).netloc, str(x.get("id") or url)
         posted = x.get("date_posted")
         out.append(Job(

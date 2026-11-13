@@ -366,7 +366,7 @@ HELP = """Команды:
   analyze                      оценить новые вакансии через LLM
   list [--status S] [--min-score N] [--kind K]   вакансии в базе
   review                       просмотр лучших вакансий и отметка заявок (в своём терминале)
-  add <url> [--firm NAME]      одна вакансия по ссылке: Greenhouse, Lever, Ashby или любая страница
+  add <url> [--firm NAME]      одна вакансия по ссылке: Greenhouse, Lever, Ashby, Workable или любая страница
   letters [--min-score N] [--uid UID] [--force]   письма для вакансий с баллом ≥ analyst.min_score
   pdf [--uid UID]              PDF резюме (materials/resume.pdf) с ATS-проверкой; --uid — ещё и письмо в PDF
   answers                      ответить на вопросы анкет, которых агент не знает (сохраняются в answers.yaml)

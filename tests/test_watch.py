@@ -36,7 +36,7 @@ def fake_llm(monkeypatch, score=85, blocker=""):
 def test_firms_yaml_loads(cfg):
     firms = load_firms(cfg)
     assert len(firms) >= 20 and all(f.max_applications >= 1 for f in firms)
-    assert {f.ats for f in firms} <= {"greenhouse", "lever", "ashby", "site"}
+    assert {f.ats for f in firms} <= {"greenhouse", "lever", "ashby", "workable", "site"}
     assert all(f.token.startswith("https://") for f in firms if f.ats == "site")
 
 

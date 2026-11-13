@@ -1,0 +1,253 @@
+[
+ {
+  "fields": [
+   {
+    "id": "firstname",
+    "label": "First name",
+    "required": true,
+    "maxLength": 127,
+    "type": "text"
+   },
+   {
+    "id": "lastname",
+    "label": "Last name",
+    "required": true,
+    "maxLength": 127,
+    "type": "text"
+   },
+   {
+    "id": "email",
+    "label": "Email",
+    "required": true,
+    "maxLength": 255,
+    "type": "email"
+   },
+   {
+    "id": "phone",
+    "label": "Phone",
+    "required": false,
+    "helper": "The hiring team may use this number to contact you about this job.",
+    "maxLength": 255,
+    "type": "phone"
+   },
+   {
+    "id": "address",
+    "label": "Address",
+    "required": false,
+    "helper": "Include your city, region, and country, so that employers can easily manage your application.",
+    "type": "text",
+    "value": "Amsterdam, Netherlands",
+    "prefilledByLocation": true
+   },
+   {
+    "id": "avatar",
+    "label": "Photo",
+    "required": false,
+    "maxFileSize": 12000000,
+    "supportedFileTypes": [
+     ".jpg",
+     ".jpeg",
+     ".gif",
+     ".png"
+    ],
+    "supportedMimeTypes": [
+     "image/jpeg",
+     "image/gif",
+     "image/png"
+    ],
+    "type": "file"
+   }
+  ],
+  "name": "Personal information"
+ },
+ {
+  "fields": [
+   {
+    "id": "resume",
+    "label": "Resume",
+    "required": false,
+    "maxFileSize": 12000000,
+    "supportedFileTypes": [
+     ".pdf",
+     ".doc",
+     ".docx",
+     ".odt",
+     ".rtf"
+    ],
+    "supportedMimeTypes": [
+     "application/pdf",
+     "application/msword",
+     "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+     "application/vnd.oasis.opendocument.text",
+     "application/rtf"
+    ],
+    "type": "file"
+   }
+  ],
+  "name": "Profile"
+ },
+ {
+  "fields": [
+   {
+    "id": "cover_letter",
+    "label": "Cover letter",
+    "required": false,
+    "maxLength": 200000,
+    "type": "paragraph"
+   },
+   {
+    "id": "CA_39066",
+    "label": "What is the expected salary?",
+    "required": false,
+    "maxLength": 127,
+    "type": "text"
+   },
+   {
+    "id": "CA_49337",
+    "label": "How did you hear about us?",
+    "required": true,
+    "options": [
+     {
+      "name": "511907",
+      "value": "Programming events"
+     },
+     {
+      "name": "511908",
+      "value": "ML events"
+     },
+     {
+      "name": "511909",
+      "value": "Math events"
+     },
+     {
+      "name": "511910",
+      "value": "Universities & Schools"
+     },
+     {
+      "name": "511911",
+      "value": "Social Media Platforms"
+     },
+     {
+      "name": "511912",
+      "value": "Linkedin"
+     },
+     {
+      "name": "511913",
+      "value": "Personal network"
+     },
+     {
+      "name": "511914",
+      "value": "Conference"
+     },
+     {
+      "name": "511915",
+      "value": "Codeforces"
+     },
+     {
+      "name": "511916",
+      "value": "Online Job boards"
+     },
+     {
+      "name": "511917",
+      "value": "Other"
+     }
+    ],
+    "singleOption": true,
+    "type": "dropdown"
+   },
+   {
+    "id": "QA_10721464",
+    "label": "University\n(Name of the university you are currently attending or graduated from)",
+    "required": true,
+    "type": "paragraph"
+   },
+   {
+    "id": "QA_10721465",
+    "label": "Year of graduation\n(Please indicate your expected or actual graduation year)",
+    "required": true,
+    "max": 9999999999999,
+    "type": "number"
+   },
+   {
+    "id": "QA_10721466",
+    "label": "How many years of working experience do you have?\n(How many years of relevant work experience do you have? If you don’t have any yet, no worries — just type 0).",
+    "required": true,
+    "type": "paragraph"
+   },
+   {
+    "id": "QA_10721467",
+    "label": "Key technologies or programming languages of interest\n(List the main technologies or programming languages you are most experienced in or interested in working with)",
+    "required": true,
+    "type": "paragraph"
+   },
+   {
+    "id": "QA_10721468",
+    "label": "Your current location\n(Where are you currently based?)",
+    "required": true,
+    "type": "paragraph"
+   },
+   {
+    "id": "QA_10721469",
+    "label": "Are you looking for internships or full-time positions?",
+    "required": true,
+    "options": [
+     {
+      "name": "5660084",
+      "value": "Internship"
+     },
+     {
+      "name": "5660085",
+      "value": "Full-time position"
+     },
+     {
+      "name": "5660086",
+      "value": "Both"
+     }
+    ],
+    "singleOption": false,
+    "type": "multiple"
+   },
+   {
+    "id": "QA_10721470",
+    "label": "Are you open to relocate to Amsterdam?",
+    "required": true,
+    "type": "paragraph"
+   },
+   {
+    "id": "QA_10721471",
+    "label": "Are you available for an internship during your academic term (i.e., while continuing your studies)?",
+    "required": true,
+    "options": [
+     {
+      "name": "5660087",
+      "value": "Yes"
+     },
+     {
+      "name": "5660088",
+      "value": "No"
+     }
+    ],
+    "singleOption": true,
+    "type": "multiple"
+   },
+   {
+    "id": "QA_10721472",
+    "label": "Achievements and extracurriculars\n(Tell us about any notable achievements, especially in mathematical or programming competitions, research projects, or other relevant activities)",
+    "required": true,
+    "type": "paragraph"
+   }
+  ],
+  "name": "Details"
+ },
+ {
+  "fields": [
+   {
+    "id": "gdpr",
+    "onlyTrueAllowed": true,
+    "required": true,
+    "type": "boolean",
+    "url": "https://apply.workable.com/pinely/gdpr_policy"
+   }
+  ]
+ }
+]

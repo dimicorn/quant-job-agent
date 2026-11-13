@@ -1,0 +1,96 @@
+{
+ "name": "Pinely",
+ "description": "<p>We’re Pinely, an algorithmic trading firm, privately owned and funded.</p><p>As a proprietary trading firm, we’re not using capital from clients or external investors to trade. That makes all of Pinely ours: <em>our</em> ideas, <em>our</em> money, <em>our</em> technology. All built and thought out by <em>our</em> people.</p><p>We trade on the world’s financial markets using our in-house developed research and technology. Most of our strategies are based on HFT (High Frequency Trading) algorithms and depend on our ultra-low latency networks to operate optimally.<br>Our approach is all about speed, but not for the sake of it. We're all about purposeful moves. We're plugged into the latest tech, navigating the intricate world of financial markets. No manual or semi-automatic trades here — full automation is our game, a symbol of our relentless pursuit of excellence in high-frequency trading.<br><br>Thinking about jumping on board?<br>At Pinely, we're not followers; we're crafting the future in algorithmic trading. It's no cakewalk, but if you're up for the challenge, let's talk real progress.</p>",
+ "jobs": [
+  {
+   "title": "Junior Deep Learning Researcher",
+   "shortcode": "B4F63D18E2",
+   "code": "",
+   "employment_type": "Full-time",
+   "telecommuting": false,
+   "department": "Research",
+   "url": "https://apply.workable.com/j/B4F63D18E2",
+   "shortlink": "https://apply.workable.com/j/B4F63D18E2",
+   "application_url": "https://apply.workable.com/j/B4F63D18E2/apply",
+   "published_on": "2026-04-05",
+   "created_at": "2025-09-26",
+   "country": "Netherlands",
+   "city": "Amsterdam",
+   "state": "North Holland",
+   "education": "",
+   "experience": "Entry level",
+   "function": "Research",
+   "industry": "",
+   "locations": [
+    {
+     "country": "Netherlands",
+     "countryCode": "NL",
+     "city": "Amsterdam",
+     "region": "North Holland",
+     "hidden": false
+    }
+   ],
+   "description": "<p>We are Pinely, a high-frequency algorithmic trading firm based in Amsterdam.</p><p>Our team specializes in developing robust and adaptive strategies applicable across a wide range of financial instruments and exchanges. We actively support the Olympiad movement, and many of our colleagues are prize-winning mathematicians, researchers and engineers.</p><p>Researchers at Pinely benefit from working in a fast-paced HFT environment, where the impact of their ideas is quickly visible in production. The research teams are supported by a world-class infrastructure group that ensures smooth deployment and reliable experimentation at scale.</p><p>Our flat organizational structure encourages autonomy, creativity, and direct ownership. We value an informal, idea-driven culture where innovation is celebrated and every contribution matters.</p><p>We are excited to announce an opportunity for a Junior Deep Learning Researcher to join our Amsterdam-based office. <br></p><p><strong>Responsibilities</strong></p><ul><li>Conduct original research in the areas of artificial intelligence, machine learning, and related quantitative fields;</li><li>Develop and experiment with modern deep learning architectures;</li><li>Analyze large, unstructured, and noisy datasets to extract meaningful insights;</li><li>Collaborating with developers and other researchers to implement and optimize trading strategies.;</li><li>Continually explore new methodologies and technologies to enhance research outcomes.<b"
+  },
+  {
+   "title": "Machine Learning Research (Intern)",
+   "shortcode": "4B5411E50B",
+   "code": "",
+   "employment_type": "Contract",
+   "telecommuting": false,
+   "department": "Research",
+   "url": "https://apply.workable.com/j/4B5411E50B",
+   "shortlink": "https://apply.workable.com/j/4B5411E50B",
+   "application_url": "https://apply.workable.com/j/4B5411E50B/apply",
+   "published_on": "2026-02-26",
+   "created_at": "2025-09-22",
+   "country": "Netherlands",
+   "city": "Amsterdam",
+   "state": "North Holland",
+   "education": "",
+   "experience": "Internship",
+   "function": "Research",
+   "industry": "",
+   "locations": [
+    {
+     "country": "Netherlands",
+     "countryCode": "NL",
+     "city": "Amsterdam",
+     "region": "North Holland",
+     "hidden": false
+    }
+   ],
+   "description": "<p>We are excited to offer an internship opportunity for a <strong>Machine Learning Research (Intern) </strong>to join our Amsterdam-based team. As part of our research group, you will contribute to innovative projects focused on developing and improving HFT strategies using ML, DL and RL techniques. You will work closely with experienced researchers and engineers, gaining hands-on experience in applying cutting-edge ML methods to real-world financial data. This internship offers a unique opportunity to explore the intersection of AI and quantitative finance, contributing to our ongoing efforts to automate and optimize trading strategies in a highly dynamic environment.<br><br><strong>The internship duration can range from 3 to 6 months, depending on the team and the intern’s availability. Upon successful completion, you may be offered a full-time position at Pinely.</strong><br><br><strong>Responsibilities</strong></p><p></p><ul><li>Participate in conducting groundbreaking research and development of high-frequency trading (HFT) strategies;</li><li>Analyzing high-frequency trading strategies and market microstructure to identify new trading opportunities;</li><li>Collaborating with developers and other researchers to implement and optimize trading strategies;</li><li>Contributing to the improvement of existing trading strategies and assisting researchers in quantitative strategy design.</li></ul><p><br><strong>Requirements</strong></p><p></p><ul><li>Passion for research;</li"
+  },
+  {
+   "title": "Middle Quantitative Researcher",
+   "shortcode": "B2C938E416",
+   "code": "",
+   "employment_type": "Full-time",
+   "telecommuting": false,
+   "department": "Research",
+   "url": "https://apply.workable.com/j/B2C938E416",
+   "shortlink": "https://apply.workable.com/j/B2C938E416",
+   "application_url": "https://apply.workable.com/j/B2C938E416/apply",
+   "published_on": "2026-09-01",
+   "created_at": "2025-09-05",
+   "country": "Netherlands",
+   "city": "Amsterdam",
+   "state": "North Holland",
+   "education": "",
+   "experience": "",
+   "function": "",
+   "industry": "",
+   "locations": [
+    {
+     "country": "Netherlands",
+     "countryCode": "NL",
+     "city": "Amsterdam",
+     "region": "North Holland",
+     "hidden": false
+    }
+   ],
+   "description": "<p>We are looking for a Middle Quantitative Researcher for our office in Amsterdam who will join one of our trading teams to analyze the global markets and create and optimize profitable trading strategies.<br><strong><br>Responsibilities</strong></p><ul><li>Developing and improving trading algorithms using statistical models and machine learning techniques;</li><li>Analyzing high-frequency trading strategies and market microstructure to identify new trading opportunities;</li><li>Collaborating with developers and other researchers to implement and optimize trading strategies;</li><li>Contributing to the improvement of existing trading strategies and assisting senior researchers in quantitative strategy design.<br> </li></ul><p><strong>Requirements</strong></p><ul><li>Degree in math, physics, computer science or another quantitative field;</li><li>Track record of solving analytical problems;</li><li>Outstanding performance in mathematical competitions or competitive programming contests would be a huge advantage (but not necessary);</li><li>Experience in implementing machine learning algorithms.</li></ul><p></p><p><strong>What we offer</strong></p><ul><li>High base salary and social benefits;</li><li>Generous bonus structure. We are very flexible in discussing salary and conditions of employment;</li><li>Cutting-edge hardware and software in production as well as high technical expertise of the company which allows implementation of bold ideas and boosting great results. Owne"
+  }
+ ]
+}

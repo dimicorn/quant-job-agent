@@ -1,0 +1,314 @@
+[
+ {
+  "fields": [
+   {
+    "id": "firstname",
+    "label": "First name",
+    "required": true,
+    "maxLength": 127,
+    "type": "text"
+   },
+   {
+    "id": "lastname",
+    "label": "Last name",
+    "required": true,
+    "maxLength": 127,
+    "type": "text"
+   },
+   {
+    "id": "email",
+    "label": "Email",
+    "required": true,
+    "maxLength": 255,
+    "type": "email"
+   },
+   {
+    "id": "phone",
+    "label": "Phone",
+    "required": false,
+    "helper": "The hiring team may use this number to contact you about this job.",
+    "maxLength": 255,
+    "type": "phone"
+   },
+   {
+    "id": "address",
+    "label": "Address",
+    "required": false,
+    "helper": "Include your city, region, and country, so that employers can easily manage your application.",
+    "type": "text",
+    "value": "Amsterdam, Netherlands",
+    "prefilledByLocation": true
+   },
+   {
+    "id": "avatar",
+    "label": "Photo",
+    "required": false,
+    "maxFileSize": 12000000,
+    "supportedFileTypes": [
+     ".jpg",
+     ".jpeg",
+     ".gif",
+     ".png"
+    ],
+    "supportedMimeTypes": [
+     "image/jpeg",
+     "image/gif",
+     "image/png"
+    ],
+    "type": "file"
+   }
+  ],
+  "name": "Personal information"
+ },
+ {
+  "fields": [
+   {
+    "id": "education",
+    "label": "Education",
+    "required": false,
+    "fields": [
+     {
+      "id": "school",
+      "label": "School",
+      "required": true,
+      "maxLength": 255,
+      "type": "text"
+     },
+     {
+      "id": "field_of_study",
+      "label": "Field of study",
+      "required": false,
+      "maxLength": 255,
+      "type": "text"
+     },
+     {
+      "id": "degree",
+      "label": "Degree",
+      "required": false,
+      "maxLength": 255,
+      "type": "text"
+     },
+     {
+      "id": "start_date",
+      "label": "Start date",
+      "required": false,
+      "type": "date"
+     },
+     {
+      "id": "end_date",
+      "label": "End date",
+      "required": false,
+      "type": "date"
+     }
+    ],
+    "type": "group"
+   },
+   {
+    "id": "experience",
+    "label": "Experience",
+    "required": false,
+    "fields": [
+     {
+      "id": "title",
+      "label": "Title",
+      "required": true,
+      "maxLength": 255,
+      "type": "text"
+     },
+     {
+      "id": "company",
+      "label": "Company",
+      "required": false,
+      "maxLength": 255,
+      "type": "text"
+     },
+     {
+      "id": "industry",
+      "label": "Industry",
+      "required": false,
+      "maxLength": 255,
+      "type": "text"
+     },
+     {
+      "id": "summary",
+      "label": "Summary",
+      "required": false,
+      "type": "paragraph"
+     },
+     {
+      "id": "start_date",
+      "label": "Start date",
+      "required": false,
+      "type": "date"
+     },
+     {
+      "id": "end_date",
+      "label": "End date",
+      "required": false,
+      "type": "date"
+     },
+     {
+      "id": "current",
+      "label": "I currently work here",
+      "required": false,
+      "type": "boolean"
+     }
+    ],
+    "type": "group"
+   },
+   {
+    "id": "summary",
+    "label": "Summary",
+    "required": false,
+    "type": "paragraph"
+   },
+   {
+    "id": "resume",
+    "label": "Resume",
+    "required": false,
+    "maxFileSize": 12000000,
+    "supportedFileTypes": [
+     ".pdf",
+     ".doc",
+     ".docx",
+     ".odt",
+     ".rtf"
+    ],
+    "supportedMimeTypes": [
+     "application/pdf",
+     "application/msword",
+     "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+     "application/vnd.oasis.opendocument.text",
+     "application/rtf"
+    ],
+    "type": "file"
+   }
+  ],
+  "name": "Profile"
+ },
+ {
+  "fields": [
+   {
+    "id": "cover_letter",
+    "label": "Cover letter",
+    "required": false,
+    "maxLength": 200000,
+    "type": "paragraph"
+   },
+   {
+    "id": "CA_39066",
+    "label": "What is the expected salary?",
+    "required": false,
+    "maxLength": 127,
+    "type": "text"
+   },
+   {
+    "id": "CA_49337",
+    "label": "How did you hear about us?",
+    "required": true,
+    "options": [
+     {
+      "name": "511907",
+      "value": "Programming events"
+     },
+     {
+      "name": "511908",
+      "value": "ML events"
+     },
+     {
+      "name": "511909",
+      "value": "Math events"
+     },
+     {
+      "name": "511910",
+      "value": "Universities & Schools"
+     },
+     {
+      "name": "511911",
+      "value": "Social Media Platforms"
+     },
+     {
+      "name": "511912",
+      "value": "Linkedin"
+     },
+     {
+      "name": "511913",
+      "value": "Personal network"
+     },
+     {
+      "name": "511914",
+      "value": "Conference"
+     },
+     {
+      "name": "511915",
+      "value": "Codeforces"
+     },
+     {
+      "name": "511916",
+      "value": "Online Job boards"
+     },
+     {
+      "name": "511917",
+      "value": "Other"
+     }
+    ],
+    "singleOption": true,
+    "type": "dropdown"
+   },
+   {
+    "id": "QA_10705832",
+    "label": "A degree in mathematics, physics, computer science, or another quantitative discipline (or expectation of such a degree within the next year)",
+    "required": true,
+    "type": "boolean"
+   },
+   {
+    "id": "QA_10705833",
+    "label": "Knowledge of machine learning, probability theory and mathematical statistics.",
+    "required": true,
+    "type": "boolean"
+   },
+   {
+    "id": "QA_10705834",
+    "label": "Proficiency in Python.",
+    "required": true,
+    "type": "boolean"
+   },
+   {
+    "id": "QA_10705835",
+    "label": "Some experience with C++, although not necessarily in an industrial setting.",
+    "required": true,
+    "type": "boolean"
+   },
+   {
+    "id": "QA_10705836",
+    "label": "Practical experience with modern DL architecture.",
+    "required": true,
+    "type": "boolean"
+   },
+   {
+    "id": "QA_10705837",
+    "label": "Background in analyzing large, unstructured, and noisy datasets.",
+    "required": true,
+    "type": "boolean"
+   },
+   {
+    "id": "QA_10705838",
+    "label": "Would be beneficial: Published research findings in top-tier journals and conferences (ICML, NeurIPS, ICLR, CVPR, ICCV).",
+    "required": true,
+    "type": "boolean"
+   }
+  ],
+  "name": "Details"
+ },
+ {
+  "fields": [
+   {
+    "id": "gdpr",
+    "onlyTrueAllowed": true,
+    "required": true,
+    "type": "boolean",
+    "url": "https://apply.workable.com/pinely/gdpr_policy"
+   }
+  ]
+ }
+]

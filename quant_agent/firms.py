@@ -12,7 +12,7 @@ from .config import Config
 
 class Firm(BaseModel):
     name: str
-    ats: Literal["greenhouse", "lever", "ashby", "site"]
+    ats: Literal["greenhouse", "lever", "ashby", "workable", "site"]
     token: str                     # доска ATS; для site — адрес страницы карьеры
     links: str = ""                # site: регулярка путей страниц вакансий («^/jobs/»); пусто — вся страница одной записью
     tier: int = 2

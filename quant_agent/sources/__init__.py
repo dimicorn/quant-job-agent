@@ -8,10 +8,12 @@ from types import ModuleType
 from urllib.parse import parse_qs, urlparse
 
 from ..jobs import Job, html_to_text
-from . import ashby, greenhouse, lever, site
+from . import ashby, greenhouse, lever, site, workable
 from .http import SourceError, get
 
-SOURCES: dict[str, ModuleType] = {"greenhouse": greenhouse, "lever": lever, "ashby": ashby, "site": site}
+SOURCES: dict[str, ModuleType] = {"greenhouse": greenhouse, "lever": lever, "ashby": ashby, "workable": workable,
+                                   "site": site}
+API_ATS = ("greenhouse", "lever", "ashby", "workable")  # площадки с API вакансий и формой, которую заполняет агент
 
 
 def fetch_firm(f) -> list[Job]:
@@ -35,6 +37,11 @@ def detect(url: str) -> tuple[str, str, str] | None:
         return "lever", parts[0], parts[1]
     if host == "jobs.ashbyhq.com" and len(parts) >= 2:
         return "ashby", parts[0], parts[1]
+    if host == "apply.workable.com" and "j" in parts and parts.index("j") + 1 < len(parts):
+        i = parts.index("j")  # /<account>/j/<shortcode>/… или /j/<shortcode> (без аккаунта)
+        return "workable", parts[i - 1] if i else "", parts[i + 1]
+    if host.endswith(".workable.com") and host != "apply.workable.com" and len(parts) >= 2 and parts[0] == "j":
+        return "workable", host.split(".")[0], parts[1]  # старый адрес <account>.workable.com/j/<shortcode>
     gh = qs.get("gh_jid")
     if gh:
         return "greenhouse", "", gh[0]
@@ -106,4 +113,4 @@ def fetch_url(url: str, firm: str = "") -> Job:
     return job
 
 
-__all__ = ["SOURCES", "SourceError", "detect", "fetch_firm", "fetch_url", "parse_page"]
+__all__ = ["API_ATS", "SOURCES", "SourceError", "detect", "fetch_firm", "fetch_url", "parse_page"]

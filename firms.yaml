@@ -2,9 +2,9 @@
 # название фирмы в ответе совпадает. Проверить заново — uv run quant-agent firms --validate.
 #
 # Поля:
-#   ats    — greenhouse | lever | ashby | site (свой сайт фирмы: откликаться вручную)
+#   ats    — greenhouse | lever | ashby | workable | site (свой сайт фирмы: откликаться вручную)
 #   token  — имя доски в API (boards-api.greenhouse.io/v1/boards/<token>, api.lever.co/v0/postings/<token>,
-#            api.ashbyhq.com/posting-api/job-board/<token>); для site — адрес страницы карьеры
+#            api.ashbyhq.com/posting-api/job-board/<token>, apply.workable.com/<token>); для site — адрес страницы карьеры
 #   links  — site: регулярка путей страниц вакансий; пусто — вся страница карьеры одной записью (следим за изменениями)
 #   kinds  — какие вакансии брать у этой фирмы вместо filters.kinds (internship | graduate | full_time)
 #   tier   — 1 — в первую очередь, 3 — запасные (порядок в review)
@@ -56,9 +56,8 @@ firms:
 
   # ── Русскоязычные команды: реально попасть из РФ, много выпускников ШАДа и МФТИ ──
   # Берём и обычные junior-позиции, не только стажировки (kinds).
-  # Pinely в ноябре 2026 ушла с Ashby на Workable (apply.workable.com/pinely): API Ashby ещё отдаёт старые
-  # вакансии, но их страниц и форм уже нет. Вернуть, когда агент научится Workable.
-  # - {name: Pinely, ats: workable, token: pinely, tier: 1, kinds: [internship, graduate, full_time]}
+  # в ноябре 2026 ушла с Ashby на Workable: API Ashby ещё отдаёт старые вакансии без форм
+  - {name: Pinely, ats: workable, token: pinely, tier: 1, kinds: [internship, graduate, full_time]}
   - {name: Teza Technologies, ats: ashby, token: teza-technologies, tier: 1, kinds: [internship, graduate, full_time]}
   - {name: Alber Blanc, ats: site, token: "https://alberblanc.com/careers/", links: "^/careers/[^/]+/?$", tier: 1,
      kinds: [internship, graduate, full_time]}

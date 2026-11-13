@@ -10,7 +10,7 @@
 firms.yaml → доски ATS (публичный JSON API) → тип вакансии → фильтры → условия допуска → оценка LLM → review
 ```
 
-- **Источники.** Greenhouse, Lever, Ashby — публичные API досок, без логина, браузера и капчи. Фирмы без ATS
+- **Источники.** Greenhouse, Lever, Ashby, Workable — публичные API досок, без логина, браузера и капчи. Фирмы без ATS
   (Alber Blanc, Wunder Fund, QST, SPECTRAL…) — `ats: site`: страница карьеры и ссылки на вакансии по шаблону
   `links`, либо слежение за изменениями всей страницы. Списки SimplifyJobs на GitHub (`watch.aggregators`) приносят
   quant-стажировки и позиции для выпускников из фирм, которых нет в `firms.yaml` (Workday, iCIMS — подача вручную).
@@ -37,11 +37,11 @@ cp config.example.yaml config.yaml      # заполнить eligibility, prefer
 uv run quant-agent firms --validate     # доски отвечают?
 uv run quant-agent watch                # опросить доски и оценить новые вакансии
 uv run quant-agent review               # лучшие вакансии; [o] открыть форму, [a] отметить заявку
-uv run quant-agent add <url>            # одна вакансия по ссылке (Greenhouse/Lever/Ashby или любая страница)
+uv run quant-agent add <url>            # одна вакансия по ссылке (Greenhouse/Lever/Ashby/Workable или любая страница)
 uv run quant-agent stats
 ```
 
-## Автопилот (Greenhouse, Lever, Ashby)
+## Автопилот (Greenhouse, Lever, Ashby, Workable)
 
 ```bash
 uv run quant-agent autopilot              # один проход: опрос и оценка в фоне, формы подряд; режим из apply.mode
@@ -51,7 +51,8 @@ uv run quant-agent apply <uid> --mode assist         # одна вакансия
 ```
 
 - **План ответов до браузера.** Поля формы: Greenhouse — API (`?questions=true`), Lever — HTML формы
-  (`cards[…][baseTemplate]`), Ashby — GraphQL страницы формы. Источники ответов:
+  (`cards[…][baseTemplate]`), Ashby — GraphQL страницы формы, Workable — API формы (`/api/v1/jobs/<shortcode>/form`;
+  Address Workable подставляет по IP — агент печатает поверх `profile.city`). Источники ответов:
   профиль (`profile`), резюме и письмо, банк ответов `answers.yaml`, вопросы с единственным вариантом-согласием
   (`apply.auto_consent`), остальное — LLM строго по резюме и фактам. Чего в фактах нет (GPA, местоимения, регион,
   другие офферы…) — статус `needs_answers`: отвечаете один раз командой `answers`, ответ подходит для такого же
