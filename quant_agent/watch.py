@@ -7,6 +7,8 @@ import subprocess
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 
+from rich.markup import escape
+
 from . import analyst, stop
 from .config import Config
 from .db import DB, now
@@ -120,11 +122,21 @@ def _aggregators(cfg: Config, db: DB, firms: list[Firm], s: Summary) -> None:
                     continue
             st = ingest(cfg, db, job, kinds)
             if st == "new":
-                s.new += 1
+                _new(s, job)
             elif st == "filtered":
                 s.filtered += 1
             elif st == "ineligible":
                 s.ineligible += 1
+
+
+SHOW_NEW = 30  # строк «+ новая вакансия» за опрос; первый опрос находит сотни — остальные одной строкой
+
+
+def _new(s: Summary, job) -> None:
+    s.new += 1
+    if s.new <= SHOW_NEW:
+        console.print(f"  [green]+[/] {escape(job.firm)} — {escape(job.title)}"
+                      + (f" [dim]({escape(job.location)})[/]" if job.location else ""))
 
 
 def run_once(cfg: Config, db: DB, firms: list[Firm] | None = None, score: bool = True) -> Summary:
@@ -142,13 +154,15 @@ def run_once(cfg: Config, db: DB, firms: list[Firm] | None = None, score: bool =
         for job in p.jobs:
             st = ingest(cfg, db, job, p.firm.kinds)
             if st == "new":
-                s.new += 1
+                _new(s, job)
             elif st == "filtered":
                 s.filtered += 1
             elif st == "ineligible":
                 s.ineligible += 1
         s.closed += db.close_missing(f.name, f.ats, f.token, {j.uid for j in p.jobs})
     _aggregators(cfg, db, firms, s)
+    if s.new > SHOW_NEW:
+        console.print(f"  [dim]… и ещё {s.new - SHOW_NEW}[/]")
     console.print(f"Доски: {s.boards} (ошибок {s.errors}); новых к оценке: {s.new}, отсеяно фильтрами: {s.filtered}, "
                   f"не подходят по условиям: {s.ineligible}, закрылось: {s.closed}")
     if score and s.new:

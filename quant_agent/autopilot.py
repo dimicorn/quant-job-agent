@@ -11,10 +11,12 @@ from __future__ import annotations
 import random
 import re
 import threading
-from datetime import datetime
+from collections import Counter
+from datetime import datetime, timedelta
 from pathlib import Path
 
 from playwright.sync_api import Error as PlaywrightError
+from rich.markup import escape
 
 from . import answers, materials, stop, watch
 from .applier import BrowserClosed, FormApplier, FormError, GreenhouseApplier
@@ -66,7 +68,7 @@ def prepare(cfg: Config, db: DB, row: dict) -> answers.Plan | None:
     if plan.missing:
         db.update(row["uid"], status="needs_answers",
                   error="; ".join(f"{m['label'][:80]} ({m['why']})" for m in plan.missing))
-        console.print(f"[yellow]? {row['firm']} — {row['title']}[/]: вопросов без ответа — {len(plan.missing)} "
+        console.print(f"[yellow]? {escape(row['firm'])} — {escape(row['title'])}[/]: вопросов без ответа — {len(plan.missing)} "
                       f"(uv run quant-agent answers)")
         return None
     return plan
@@ -87,15 +89,21 @@ def _not_opened(db: DB, page, row: dict, title: str, e: Exception) -> str:
         text = ""
     if GONE.search(text):
         db.update(row["uid"], status="gone", error=f"формы нет на сайте: {page.url}", decided_at=now())
-        console.print(f"[yellow]→ gone[/] {title}: формы нет на сайте ({page.url}) — фирма убрала вакансию или сменила ATS")
+        console.print(f"[yellow]→ gone[/] {escape(title)}: формы нет на сайте ({page.url}) — фирма убрала вакансию или сменила ATS")
         return "gone"
-    console.print(f"[yellow]Форма не открылась[/] {title}: {str(e).splitlines()[0][:150]} — попробую в следующий проход")
+    console.print(f"[yellow]Форма не открылась[/] {escape(title)}: {escape(str(e).splitlines()[0][:150])} — попробую в следующий проход")
     return "retry"
+
+
+def _shown(cfg: Config, note: str) -> str:
+    """Заметка для журнала: снимок — отдельной строкой и путём от папки проекта (в базе — полный путь)."""
+    note = escape(note.replace(f"{cfg.base_dir}/", ""))
+    return note.replace("; снимок: ", "\n    [dim]снимок:[/] ")
 
 
 def apply_one(cfg: Config, db: DB, page, row: dict, plan: answers.Plan, mode: str | None = None) -> str:
     title = f"{row['firm']} — {row['title']}"
-    console.print(f"Заполняю: {title} ({row['score']})")
+    console.print(f"Заполняю: {escape(title)} [bold]({row['score']})[/]")
     source, cls = APPLIERS[row["ats"]]
     ap = cls(page, cfg, mode)
     ap.firm = row["firm"]
@@ -119,17 +127,17 @@ def apply_one(cfg: Config, db: DB, page, row: dict, plan: answers.Plan, mode: st
         if not page.is_closed() and not isinstance(e, BrowserClosed):
             status, note = "error", f"браузер: {str(e).splitlines()[0][:200]}"
         else:
-            console.print(f"[yellow]Окно браузера закрыто — {title} остаётся в очереди.[/]")
+            console.print(f"[yellow]Окно браузера закрыто — {escape(title)} остаётся в очереди.[/]")
             return "closed"
     if status == "applied":
         db.update(row["uid"], status="applied", applied_at=now(), note=note, error=None)
-        console.print(f"[green]✓ {title}[/]: {note}")
+        console.print(f"[green]✓ заявка отправлена[/] [dim]({escape(note)})[/]")
     elif status == "dry_run":
         db.update(row["uid"], note=note)
-        console.print(f"[cyan]dry-run {title}[/]: {note}")
+        console.print(f"[cyan]dry-run[/]: {_shown(cfg, note)}")
     else:
         db.update(row["uid"], status=status, error=note)
-        console.print(f"[yellow]→ {status}[/] {title}: {note}")
+        console.print(f"[yellow]→ {status}[/]: {_shown(cfg, note)}")
     log_event(cfg, "apply", uid=row["uid"], firm=row["firm"], status=status, mode=ap.mode)
     return status
 
@@ -186,6 +194,7 @@ class Browser:
             return
         self.handed.append((page, row))
         self._given.append(page)
+        console.print("    [dim]форма оставлена вам во вкладке: отправьте её сами или закройте[/]")
         try:
             page.bring_to_front()
         except PlaywrightError:
@@ -201,7 +210,7 @@ class Browser:
             if FormApplier(page, self.cfg).confirmed():
                 db.update(row["uid"], status="applied", applied_at=now(), note="отправлено вами (manual)", error=None)
                 log_event(self.cfg, "apply", uid=row["uid"], firm=row["firm"], status="applied", mode="manual")
-                console.print(f"[green]✓ {row['firm']} — {row['title']}[/]: отправлено вами")
+                console.print(f"[green]✓ {escape(row['firm'])} — {escape(row['title'])}[/]: отправлено вами")
                 continue
             left.append((page, row))
         self.handed = left
@@ -242,11 +251,18 @@ def _produce(cfg: Config, firms: list[Firm], producing: threading.Event) -> None
         producing.clear()
 
 
-def run_once(cfg: Config, db: DB, browser: Browser, mode: str | None = None, poll: bool = True) -> int:
+def run_once(cfg: Config, db: DB, browser: Browser, mode: str | None = None, poll: bool = True,
+             outcomes: Counter | None = None) -> int:
     """Один проход, как autopilot в hh-agent: опрос досок, оценка и письма идут в фоне, заявки подаются сразу из
     очереди; после каждой заявки очередь пересчитывается (лимиты на фирму). Проход заканчивается, когда очередь
-    пуста и фон закончил, или по лимиту и рабочим часам. Вернуть число отправленных заявок."""
+    пуста и фон закончил, или по лимиту и рабочим часам. Вернуть число отправленных заявок; итоги остальных
+    заявок (manual, needs_answers…) — в outcomes."""
     firms = load_firms(cfg)
+    outcomes = Counter() if outcomes is None else outcomes
+    a = cfg.apply
+    console.print(f"{'[bold]DRY-RUN[/] — ' if (mode or a.mode) == 'dry_run' else ''}режим {mode or a.mode}: "
+                  f"в очереди {len(candidates(cfg, db, firms))}, за проход максимум {a.max_per_run}, "
+                  f"сегодня {db.applied_today()} из {a.daily_limit}" + (" · опрос досок в фоне" if poll else ""))
     producing = threading.Event()
     bg = None
     if poll:
@@ -275,17 +291,24 @@ def run_once(cfg: Config, db: DB, browser: Browser, mode: str | None = None, pol
             try:
                 plan = prepare(cfg, db, row)
             except SourceError as e:
-                console.print(f"[red]Вопросы формы не получены[/] {row['firm']}: {e}")
+                console.print(f"[red]Вопросы формы не получены[/] {escape(row['firm'])}: {escape(str(e))}")
                 continue
             if plan is None:
+                outcomes["needs_answers"] += 1
                 continue
             status = apply_one(cfg, db, browser.page(), row, plan, mode)
+            outcomes[status] += 1
             if status == "manual":
                 browser.hand_off(row)
             if status == "applied":
                 sent, errors = sent + 1, 0
                 done_firms.add(row["firm"])
-                if stop.wait(random.uniform(*cfg.apply.delay_seconds)):
+                if db.applied_today() >= a.daily_limit or sent >= a.max_per_run:
+                    continue  # лимит — пауза не нужна, проход закончится на следующем круге
+                delay = random.uniform(*a.delay_seconds)
+                console.print(f"[dim]Пауза до следующей заявки: {delay / 60:.1f} мин "
+                              f"(до {datetime.now() + timedelta(seconds=delay):%H:%M:%S})[/]")
+                if stop.wait(delay):
                     break
             elif status == "closed":
                 if not browser.check_handed(db):  # оставленные вам формы не закрываем
@@ -308,14 +331,26 @@ def run_once(cfg: Config, db: DB, browser: Browser, mode: str | None = None, pol
 def run(cfg: Config, db: DB, mode: str | None = None) -> int:
     """Один проход и выход, как autopilot в hh-agent; повторять — запуском по расписанию. Вернуть число заявок."""
     browser = Browser(cfg)
-    sent = 0
-    try:
-        sent = run_once(cfg, db, browser, mode)
-        console.print(f"Проход закончен: отправлено {sent}, сегодня {db.applied_today()} из {cfg.apply.daily_limit}.")
-    except stop.Stopped:
-        pass
-    finally:
-        if not stop.requested():
-            browser.wait_handed(db)
-        browser.close()
+    sent, outcomes = 0, Counter()
+    with console.tagged("заявки"):
+        try:
+            sent = run_once(cfg, db, browser, mode, outcomes=outcomes)
+            console.print(summary(cfg, db, sent, outcomes))
+        except stop.Stopped:
+            pass
+        finally:
+            if not stop.requested():
+                browser.wait_handed(db)
+            browser.close()
     return sent
+
+
+OUTCOMES = {"dry_run": "dry-run", "manual": "оставлено вам", "needs_answers": "ждут ответов (quant-agent answers)",
+            "error": "ошибок", "retry": "не открылось", "gone": "удалено с сайта", "closed": "окно закрыто"}
+
+
+def summary(cfg: Config, db: DB, sent: int, outcomes: Counter) -> str:
+    """Итог прохода, как в hh-agent: что отправлено, что ждёт вас, сколько всего сегодня."""
+    parts = [f"отправлено {sent}"] + [f"{label} {outcomes[k]}" for k, label in OUTCOMES.items() if outcomes[k]]
+    return (f"[bold]Готово:[/] {', '.join(parts)}. "
+            f"Сегодня всего заявок: {db.applied_today()}/{cfg.apply.daily_limit}")

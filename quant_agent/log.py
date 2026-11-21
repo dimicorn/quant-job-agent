@@ -4,7 +4,10 @@
 
 console.sequential() — работа идёт параллельно, а вывод блоками по порядку (например, по фирмам: одна, потом
 другая): строки текущего блока печатаются сразу, следующих — копятся и выходят
-целиком (с исходным временем), когда закончится предыдущий блок (section_done)."""
+целиком (с исходным временем), когда закончится предыдущий блок (section_done).
+
+console.tagged(имя) — то же время и имя для строк главного потока (в autopilot заявки подаются в главном
+потоке, а опрос и оценка — в потоке «опрос-оценка»), чтобы журнал читался одной колонкой."""
 from __future__ import annotations
 
 import threading
@@ -20,9 +23,14 @@ def _worker() -> str | None:
     return None if t is threading.main_thread() else t.name
 
 
+_main_tag: str | None = None  # имя строк главного потока внутри console.tagged()
+
+
 class _Console(Console):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
+        if not self.is_terminal:  # журнал в файл (launchd): запись — одной строкой, без переносов по 80 символов
+            self.soft_wrap = True
         self._seq_lock = threading.RLock()
         self._order: list[tuple[str, str]] = []  # (блок, заголовок) по порядку вывода
         self._index: dict[str, int] = {}
@@ -32,7 +40,7 @@ class _Console(Console):
         self._buffers: dict[str, list[tuple[tuple, dict]]] = {}
 
     def print(self, *objects, **kwargs) -> None:
-        name = _worker()
+        name = _worker() or _main_tag
         if name and objects and isinstance(objects[0], str):
             tag = (f"{datetime.now():%H:%M:%S} {name} " if kwargs.get("markup") is False
                    else f"[dim]{datetime.now():%H:%M:%S}[/] [bold]{name}[/] ")
@@ -45,10 +53,20 @@ class _Console(Console):
             super().print(*objects, **kwargs)
 
     def rule(self, title: str = "", **kwargs) -> None:
-        if _worker():
+        if _worker() or _main_tag:
             self.print(f"── {title} ──" if title else "──")
         else:
             super().rule(title, **kwargs)
+
+    @contextmanager
+    def tagged(self, name: str) -> Iterator[None]:
+        """Строки главного потока — со временем и именем name, как у рабочих потоков."""
+        global _main_tag
+        prev, _main_tag = _main_tag, name
+        try:
+            yield
+        finally:
+            _main_tag = prev
 
     @contextmanager
     def sequential(self, order: list[tuple[str, str]], section_of: Callable[[str], str | None]) -> Iterator[None]:

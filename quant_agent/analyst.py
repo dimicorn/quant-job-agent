@@ -7,6 +7,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Literal
 
 from pydantic import BaseModel
+from rich.markup import escape
 
 from . import stop
 from .config import Config
@@ -146,6 +147,16 @@ def save(db: DB, row: dict, a: Assessment, resume: str) -> None:
     db.update(row["uid"], **fields)
 
 
+def _show(cfg: Config, row: dict, a: Assessment) -> None:
+    """Строка оценки, как в hh-agent: балл (зелёный — проходит порог), фирма — вакансия."""
+    title = escape(f"{row['firm']} — {row['title']}")
+    if a.blocker.strip():
+        console.print(f"  [dim]  ✗ {title}: {escape(a.blocker.strip()[:100])}[/]")
+        return
+    color = "green" if a.score >= cfg.analyst.min_score else "dim"
+    console.print(f"  [{color}]{a.score:>3}[/] {title}")
+
+
 def analyze_new(cfg: Config, db: DB, uids: set[str] | None = None) -> int:
     """Оценить вакансии в статусе new (только uids, если заданы). Вернуть, сколько оценено."""
     rows = [r for r in db.by_status("new") if uids is None or r["uid"] in uids]
@@ -177,6 +188,7 @@ def analyze_new(cfg: Config, db: DB, uids: set[str] | None = None) -> int:
                         continue
                     save(db, row, a, resume)
                     done += 1
+                    _show(cfg, row, a)
         finally:
             for other in futs:
                 other.cancel()
