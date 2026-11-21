@@ -170,3 +170,39 @@ def test_browser_hands_off_manual_form(cfg, db):
         assert b.page() not in (first, second)
     finally:
         b.close()
+
+
+def test_run_log_like_hh_agent(cfg, db, monkeypatch):
+    """Журнал прохода: время и «заявки» у каждой строки, шапка с очередью, пауза, итог по исходам."""
+    import re
+
+    from quant_agent.log import console
+    cfg.apply.min_score, cfg.apply.daily_limit, cfg.apply.mode = 80, 10, "auto"
+    cfg.apply.delay_seconds, cfg.apply.active_hours = (60, 60), (0, 24)
+    add(db, "greenhouse:optiverus:1", "Optiver", 95)
+    add(db, "greenhouse:imc:2", "IMC", 90)
+    monkeypatch.setattr(autopilot, "load_firms", lambda cfg: FIRMS)
+    monkeypatch.setattr(autopilot, "prepare", lambda cfg, db, row: Plan([], []))
+    monkeypatch.setattr(autopilot.stop, "wait", lambda s: False)
+    monkeypatch.setattr(autopilot, "_produce", lambda cfg, firms, producing: producing.clear())  # без сети и LLM
+    outcomes = {"greenhouse:optiverus:1": "applied", "greenhouse:imc:2": "manual"}
+
+    def fake_apply(cfg, db, page, row, plan, mode=None):
+        if outcomes[row["uid"]] == "applied":
+            db.update(row["uid"], status="applied", applied_at=autopilot.now())
+        return outcomes[row["uid"]]
+    monkeypatch.setattr(autopilot, "apply_one", fake_apply)
+    monkeypatch.setattr(autopilot, "Browser", lambda cfg: type("B", (NoBrowser,), {"wait_handed": lambda s, db: None})())
+
+    with console.capture() as cap:
+        assert autopilot.run(cfg, db) == 1
+    lines = cap.get().splitlines()
+    assert all(re.match(r"\d\d:\d\d:\d\d заявки ", ln) for ln in lines), lines
+    assert "режим auto: в очереди 2, за проход максимум" in lines[0]
+    assert any("Пауза до следующей заявки: 1.0 мин" in ln for ln in lines)
+    assert "Готово: отправлено 1, оставлено вам 1. Сегодня всего заявок: 1/10" in lines[-1]
+
+
+def test_shown_note_is_short(cfg):
+    note = f"форма: нет варианта «Other [x]»; снимок: {cfg.base_dir}/debug/1.png"
+    assert autopilot._shown(cfg, note) == "форма: нет варианта «Other \\[x]»\n    [dim]снимок:[/] debug/1.png"
