@@ -32,9 +32,9 @@ uv sync && uv run playwright install chromium
 `0.2.1.devN+g<коммит>`; в `pyproject.toml` её править не нужно.
 
 `main` защищён (ruleset «main через PR»): изменения попадают в него только через PR, в котором прошли
-проверки CI (Ruff и тесты на Ubuntu и macOS); force-push и удаление `main` запрещены. При слиянии squash-коммитом
-заголовок PR становится сообщением коммита, поэтому заголовок PR тоже пишется по Conventional Commits —
-в CHANGELOG запись получит ссылку на PR.
+проверки CI (Ruff и тесты на Ubuntu и macOS); force-push и удаление `main` запрещены. PR сливается только
+merge-коммитом (squash и rebase выключены): коммиты ветки попадают в `main` как есть, поэтому каждый из них пишется
+по Conventional Commits — в CHANGELOG это отдельные записи, а сам «Merge pull request…» git-cliff пропускает.
 
 CHANGELOG.md собирает git-cliff по `cliff.toml` из истории коммитов. Релиз — тоже через PR:
 
