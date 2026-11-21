@@ -93,6 +93,7 @@ apply:
   answers_file: answers.yaml         # ваши ответы на вопросы анкет; пополняется командой answers
   profile_dir: .browser-profile
   headless: false
+  browser_channel: chrome            # ваш установленный Chrome — капчи пропускают его чаще; "" — Chromium из Playwright
   submit_wait_minutes: 20            # assist: сколько ждать, пока вы нажмёте Submit
   active_hours: [8, 23]
   weekdays_only: false
