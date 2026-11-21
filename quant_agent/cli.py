@@ -294,6 +294,10 @@ def cmd_apply(cfg: Config, args) -> int:
     browser = Browser(cfg)
     try:
         status = apply_one(cfg, db, browser.page(), row, plan, args.mode)
+        if status == "manual":
+            browser.hand_off(row)
+            browser.wait_handed(db)
+            status = (db.get(row["uid"]) or {}).get("status", status)
     finally:
         browser.close()
     return 0 if status in ("applied", "dry_run") else 1

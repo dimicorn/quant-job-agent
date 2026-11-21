@@ -97,6 +97,7 @@ class Apply(BaseModel):
     answers_file: str = "answers.yaml"     # ваши ответы на вопросы анкет; пополняется командой answers
     profile_dir: str = ".browser-profile"
     headless: bool = False
+    browser_channel: str = "chrome"        # ваш Chrome (капчи пропускают его чаще); "" — Chromium из Playwright
     submit_wait_minutes: int = 20          # assist: сколько ждать, пока вы нажмёте Submit
     active_hours: tuple[int, int] = (8, 23)
     weekdays_only: bool = False

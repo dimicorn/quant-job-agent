@@ -144,3 +144,31 @@ def test_missing_option_is_form_error(page, fast, tmp_path):
     ap.open(URL)
     with pytest.raises(FormError, match="нет варианта"):
         ap.fill(Plan([Step("CA_1", "How did you hear about us?", "select", ["Hackathon"], "answers")]), tmp_path)
+
+
+SVG_JUNK = '<svg><desc><p>SVGs not supported by this browser.</p></desc></svg>'
+
+
+def test_dropdown_restored_draft_is_kept(page, fast, tmp_path):
+    """Workable подставил прошлый ответ из черновика: у выбранного варианта галочка с текстом-заглушкой."""
+    ap = WorkableApplier(page, fast, "dry_run")
+    ap.open(URL)
+    page.evaluate(f"""() => {{
+        document.getElementById('input_CA_1_input').value = 'Linkedin';
+        const o = document.querySelector('#input_CA_1_listbox [role=option]');
+        o.innerHTML = '{SVG_JUNK}<span data-role="option-label">Linkedin</span>'; }}""")
+    plan = Plan([Step("CA_1", "How did you hear about us?", "select", ["Linkedin"], "answers")])
+    ap.fill(plan, tmp_path)
+    assert ap.verify(plan) == []
+    assert page.locator("#input_CA_1_listbox").is_hidden()   # меню не открывали
+
+
+def test_dropdown_matches_option_label(page, fast, tmp_path):
+    ap = WorkableApplier(page, fast, "dry_run")
+    ap.open(URL)
+    page.evaluate(f"""() => {{
+        const o = document.querySelectorAll('#input_CA_1_listbox [role=option]')[1];
+        o.innerHTML = '{SVG_JUNK}<span data-role="option-label">ML events</span>'; }}""")
+    plan = Plan([Step("CA_1", "How did you hear about us?", "select", ["ML events"], "answers")])
+    ap.fill(plan, tmp_path)
+    assert ap.verify(plan) == []

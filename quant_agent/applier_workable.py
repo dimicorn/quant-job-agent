@@ -78,11 +78,18 @@ class WorkableApplier(FormApplier):
             self.page.wait_for_timeout(200)
 
     def _dropdown(self, s: Step, combo) -> None:
+        """Workable хранит черновик анкеты (localStorage) и подставляет прошлый ответ. У выбранного варианта
+        иконка-галочка, и в его тексте есть «SVGs not supported by this browser.» — сверяем подпись варианта
+        [data-role=option-label], а уже выбранное не трогаем."""
         for v in s.value:
+            if combo.input_value().strip().lower() == v.strip().lower():
+                continue
             combo.scroll_into_view_if_needed()
             combo.click()
             menu = self.page.locator(f'#input_{_q(s.id)}_listbox [role=option]')
-            opt = menu.filter(has_text=re.compile(rf"^\s*{re.escape(v)}\s*$", re.I))
+            exact = re.compile(rf"^\s*{re.escape(v)}\s*$", re.I)
+            label = self.page.locator("[data-role=option-label]").filter(has_text=exact)
+            opt = menu.filter(has=label).or_(menu.filter(has_text=exact))
             try:
                 opt.first.wait_for(state="visible", timeout=8000)
             except Exception:  # noqa: BLE001

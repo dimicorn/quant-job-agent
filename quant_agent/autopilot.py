@@ -17,7 +17,7 @@ from pathlib import Path
 from playwright.sync_api import Error as PlaywrightError
 
 from . import answers, materials, stop, watch
-from .applier import BrowserClosed, FormError, GreenhouseApplier
+from .applier import BrowserClosed, FormApplier, FormError, GreenhouseApplier
 from .applier_ashby import AshbyApplier
 from .applier_lever import LeverApplier
 from .applier_workable import WorkableApplier
@@ -135,23 +135,87 @@ def apply_one(cfg: Config, db: DB, page, row: dict, plan: answers.Plan, mode: st
 
 
 class Browser:
-    """Один постоянный профиль Chromium на запуск: куки и согласия сайтов сохраняются между заявками."""
+    """Один постоянный профиль браузера на запуск: куки и согласия сайтов сохраняются между заявками.
+
+    Форму, которую агент не смог заполнить (manual), он оставляет вам во вкладке и больше её не трогает:
+    следующая заявка открывается в новой вкладке, а в конце прохода агент ждёт, пока вы отправите
+    или закроете оставленные формы."""
+
+    # Капчи (Cloudflare Turnstile, hCaptcha) не пропускают браузер, который выдаёт автоматизацию:
+    # флаг --enable-automation и navigator.webdriver. Убираем оба; полной маскировки это не даёт.
+    ARGS = ["--disable-blink-features=AutomationControlled"]
+    IGNORE = ["--enable-automation"]
 
     def __init__(self, cfg: Config):
-        self.cfg, self._pw, self._ctx = cfg, None, None
+        self.cfg, self._pw, self._ctx, self._page = cfg, None, None, None
+        self.handed: list[tuple] = []  # (вкладка, строка вакансии) — формы, оставленные вам и ещё открытые
+        self._given: list = []         # все вкладки, отданные вам: агент их больше не берёт
+
+    def _launch(self):
+        from playwright.sync_api import sync_playwright
+        self._pw = sync_playwright().start()
+        a = self.cfg.apply
+        kw = dict(headless=a.headless, viewport={"width": 1280, "height": 900},
+                  args=self.ARGS, ignore_default_args=self.IGNORE)
+        profile = str(self.cfg.path(a.profile_dir))
+        if a.browser_channel:
+            try:
+                return self._pw.chromium.launch_persistent_context(profile, channel=a.browser_channel, **kw)
+            except PlaywrightError as e:
+                console.print(f"[yellow]Браузер {a.browser_channel} не запустился ({str(e).splitlines()[0][:120]}) — "
+                              f"беру Chromium из Playwright.[/]")
+        return self._pw.chromium.launch_persistent_context(profile, **kw)
 
     def page(self):
+        if self._page is not None and not self._page.is_closed():
+            return self._page
         if self._ctx is None:
-            from playwright.sync_api import sync_playwright
-            self._pw = sync_playwright().start()
-            self._ctx = self._pw.chromium.launch_persistent_context(
-                str(self.cfg.path(self.cfg.apply.profile_dir)), headless=self.cfg.apply.headless,
-                viewport={"width": 1280, "height": 900})
+            self._ctx = self._launch()
         try:
-            return self._ctx.pages[0] if self._ctx.pages else self._ctx.new_page()
+            free = [p for p in self._ctx.pages if p not in self._given]
+            self._page = free[0] if free else self._ctx.new_page()
         except PlaywrightError:  # окно закрыли — запускаем браузер заново
             self.close()
             return self.page()
+        return self._page
+
+    def hand_off(self, row: dict) -> None:
+        """Форма осталась вам: вкладку больше не трогаем, следующая заявка — в новой вкладке."""
+        page, self._page = self._page, None
+        if page is None or page.is_closed():
+            return
+        self.handed.append((page, row))
+        self._given.append(page)
+        try:
+            page.bring_to_front()
+        except PlaywrightError:
+            pass
+
+    def check_handed(self, db: DB) -> int:
+        """Формы, оставленные вам: отправили — заявка applied, закрыли вкладку — забываем. Вернуть, сколько
+        ещё открыто."""
+        left = []
+        for page, row in self.handed:
+            if page.is_closed():
+                continue
+            if FormApplier(page, self.cfg).confirmed():
+                db.update(row["uid"], status="applied", applied_at=now(), note="отправлено вами (manual)", error=None)
+                log_event(self.cfg, "apply", uid=row["uid"], firm=row["firm"], status="applied", mode="manual")
+                console.print(f"[green]✓ {row['firm']} — {row['title']}[/]: отправлено вами")
+                continue
+            left.append((page, row))
+        self.handed = left
+        return len(left)
+
+    def wait_handed(self, db: DB) -> None:
+        """Перед закрытием браузера: дождаться, пока вы отправите или закроете оставленные формы."""
+        if self._ctx is None or not self.check_handed(db):
+            return
+        console.print(f"[bold]Оставленных вам форм: {len(self.handed)}[/] — отправьте их или закройте вкладки, "
+                      f"тогда браузер закроется. Ctrl+C — закрыть сразу.")
+        watch.notify("Формы ждут вас", ", ".join(f"{r['firm']} — {r['title']}" for _, r in self.handed))
+        while self.check_handed(db) and not stop.wait(3):
+            pass
 
     def close(self) -> None:
         if self._ctx is not None:
@@ -161,6 +225,7 @@ class Browser:
                 pass
             self._pw.stop()
             self._ctx = None
+        self._page, self.handed, self._given = None, [], []
 
 
 def _produce(cfg: Config, firms: list[Firm], producing: threading.Event) -> None:
@@ -206,6 +271,7 @@ def run_once(cfg: Config, db: DB, browser: Browser, mode: str | None = None, pol
                     continue
                 break
             tried.add(row["uid"])
+            browser.check_handed(db)  # формы, оставленные вам раньше, могли уже уйти
             try:
                 plan = prepare(cfg, db, row)
             except SourceError as e:
@@ -214,13 +280,16 @@ def run_once(cfg: Config, db: DB, browser: Browser, mode: str | None = None, pol
             if plan is None:
                 continue
             status = apply_one(cfg, db, browser.page(), row, plan, mode)
+            if status == "manual":
+                browser.hand_off(row)
             if status == "applied":
                 sent, errors = sent + 1, 0
                 done_firms.add(row["firm"])
                 if stop.wait(random.uniform(*cfg.apply.delay_seconds)):
                     break
             elif status == "closed":
-                browser.close()  # следующая заявка откроет новое окно
+                if not browser.check_handed(db):  # оставленные вам формы не закрываем
+                    browser.close()  # следующая заявка откроет новое окно
                 if stop.wait(30):
                     break
             elif status in ("error", "manual", "retry"):
@@ -246,5 +315,7 @@ def run(cfg: Config, db: DB, mode: str | None = None) -> int:
     except stop.Stopped:
         pass
     finally:
+        if not stop.requested():
+            browser.wait_handed(db)
         browser.close()
     return sent

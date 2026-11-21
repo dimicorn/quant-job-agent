@@ -68,6 +68,12 @@ class NoBrowser:
     def page(self):
         return None
 
+    def hand_off(self, row):
+        pass
+
+    def check_handed(self, db):
+        return 0
+
     def close(self):
         pass
 
@@ -141,3 +147,26 @@ def test_run_once_no_race_when_background_finishes_during_queue_check(cfg, db, m
     monkeypatch.setattr(autopilot, "apply_one", _fake_apply(applied))
     assert autopilot.run_once(cfg, db, NoBrowser()) == 1
     assert applied == ["greenhouse:imc:8"]
+
+
+def test_browser_hands_off_manual_form(cfg, db):
+    """Форма manual остаётся вам: следующая заявка — в новой вкладке; отправили форму — заявка applied."""
+    cfg.apply.headless, cfg.apply.browser_channel = True, ""
+    add(db, "workable:pinely:A1", "Pinely", 90, ats="workable", status="manual")
+    row = db.get("workable:pinely:A1")
+    b = autopilot.Browser(cfg)
+    try:
+        first = b.page()
+        assert first.evaluate("navigator.webdriver") is False
+        b.hand_off(row)
+        second = b.page()
+        assert second is not first and b.page() is second
+        assert b.check_handed(db) == 1 and db.get(row["uid"])["status"] == "manual"
+        first.set_content("<h1>Thank you for applying!</h1>")
+        assert b.check_handed(db) == 0 and db.get(row["uid"])["status"] == "applied"
+        b.hand_off(row)
+        second.close()
+        assert b.check_handed(db) == 0                                 # вкладку закрыли — забыли
+        assert b.page() not in (first, second)
+    finally:
+        b.close()
