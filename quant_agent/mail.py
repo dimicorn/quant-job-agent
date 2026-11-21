@@ -167,11 +167,17 @@ def wait_code(cfg: Config, since: datetime, hint: str = "", timeout: float | Non
     cache: dict = {}
     try:
         while True:
-            letters = [x for f in cfg.mail.folders for x in recent(box, f, since, cache=cache)]
+            try:
+                letters = [x for f in cfg.mail.folders for x in recent(box, f, since, cache=cache)]
+            except (OSError, imaplib.IMAP4.error) as e:  # сеть мигнула посреди ожидания — заявку не роняем
+                raise MailError(f"IMAP {cfg.mail.imap_host}: {e}") from e
             code = pick_code(letters, since, hint)
             if code or datetime.now(UTC) >= end or stop.wait(5):
                 return code
-            box.noop()
+            try:
+                box.noop()
+            except (OSError, imaplib.IMAP4.error) as e:
+                raise MailError(f"IMAP {cfg.mail.imap_host}: {e}") from e
     finally:
         try:
             box.logout()

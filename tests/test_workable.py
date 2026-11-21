@@ -172,3 +172,13 @@ def test_dropdown_matches_option_label(page, fast, tmp_path):
     plan = Plan([Step("CA_1", "How did you hear about us?", "select", ["ML events"], "answers")])
     ap.fill(plan, tmp_path)
     assert ap.verify(plan) == []
+
+
+def test_stale_checkbox_from_draft_is_unchecked(page, fast, tmp_path):
+    """Черновик Workable отметил «Both» прошлым ответом, а в плане теперь другие варианты — «Both» снимаем."""
+    ap = WorkableApplier(page, fast, "dry_run")
+    ap.open(URL)
+    page.evaluate("document.querySelector('[data-ui=QA_3] [aria-labelledby=\"q3 c3\"]').setAttribute('aria-checked', 'true')")
+    plan = Plan([Step("QA_3", "Internships or full-time?", "multiselect", ["Internship", "Full-time position"], "answers")])
+    ap.fill(plan, tmp_path)
+    assert ap.shown(plan.steps[0]) == "Internship, Full-time position"

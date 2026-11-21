@@ -170,3 +170,19 @@ def test_submit_without_mail_asks_human(page, cfg, monkeypatch):
     ap.page.locator("#security-input-0").wait_for()
     assert not ap._wait_confirmed(1)
     assert seen and "код" in seen[0][0]
+
+
+def test_wait_code_network_drop_is_mail_error(cfg, monkeypatch):
+    """Сеть мигнула посреди ожидания кода: MailError (заявка просит ввести код вручную), а не падение прохода."""
+    monkeypatch.setattr(mail.stop, "wait", lambda s: False)
+    box = FakeIMAP([])
+
+    def drop(*a, **k):
+        raise mail.imaplib.IMAP4.abort("socket error: EOF")
+    box.noop = drop
+    monkeypatch.setattr(mail, "connect", lambda c: box)
+    with pytest.raises(mail.MailError, match="EOF"):
+        mail.wait_code(cfg, datetime.now(UTC), timeout=30)
+    box.select = lambda *a, **k: (_ for _ in ()).throw(OSError("Network is unreachable"))
+    with pytest.raises(mail.MailError, match="unreachable"):
+        mail.wait_code(cfg, datetime.now(UTC), timeout=30)

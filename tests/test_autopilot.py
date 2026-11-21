@@ -206,3 +206,45 @@ def test_run_log_like_hh_agent(cfg, db, monkeypatch):
 def test_shown_note_is_short(cfg):
     note = f"форма: нет варианта «Other [x]»; снимок: {cfg.base_dir}/debug/1.png"
     assert autopilot._shown(cfg, note) == "форма: нет варианта «Other \\[x]»\n    [dim]снимок:[/] debug/1.png"
+
+
+def test_llm_error_while_planning_skips_job_not_run(cfg, db, monkeypatch):
+    """Модель ответила не по схеме на анкету одной вакансии — проход идёт дальше; лимиты LLM — проход кончается."""
+    from quant_agent.llm import LimitReached
+    cfg.apply.min_score, cfg.apply.daily_limit = 80, 10
+    cfg.apply.delay_seconds, cfg.apply.active_hours = (0, 0), (0, 24)
+    add(db, "greenhouse:optiverus:1", "Optiver", 95)
+    add(db, "greenhouse:imc:2", "IMC", 90)
+    monkeypatch.setattr(autopilot, "load_firms", lambda cfg: FIRMS)
+    applied = []
+    monkeypatch.setattr(autopilot, "apply_one", _fake_apply(applied))
+
+    def broken(cfg, db, row):
+        if row["firm"] == "Optiver":
+            raise RuntimeError("ответ модели не по схеме")
+        return Plan([], [])
+    monkeypatch.setattr(autopilot, "prepare", broken)
+    outcomes = autopilot.Counter()
+    assert autopilot.run_once(cfg, db, NoBrowser(), poll=False, outcomes=outcomes) == 1
+    assert applied == ["greenhouse:imc:2"] and outcomes["error"] == 1
+    assert db.get("greenhouse:optiverus:1")["status"] == "scored"     # осталась в очереди
+
+    add(db, "greenhouse:imc:3", "IMC", 99)
+    monkeypatch.setattr(autopilot, "prepare", lambda cfg, db, row: (_ for _ in ()).throw(LimitReached("codex")))
+    assert autopilot.run_once(cfg, db, NoBrowser(), poll=False) == 0
+
+
+def test_background_system_exit_is_reported(cfg, monkeypatch):
+    """«Codex не авторизован» (SystemExit) в потоке опроса: сообщение в журнале, флаг фона снят."""
+    import threading
+
+    from quant_agent.log import console
+
+    def no_login(*a, **k):
+        raise SystemExit("Codex не авторизован: выполните `codex login`.")
+    monkeypatch.setattr(autopilot.watch, "run_once", no_login)
+    producing = threading.Event()
+    producing.set()
+    with console.capture() as cap:
+        autopilot._produce(cfg, [], producing)
+    assert "codex login" in cap.get() and not producing.is_set()

@@ -2,7 +2,8 @@
 
 Один проход за запуск (run): опрос и оценка в фоне, заявки сразу из очереди; повтор — по расписанию. Ограничения:
   - формы Greenhouse, Lever, Ashby и Workable (APPLIERS), балл ≥ apply.min_score, есть письмо;
-  - не больше одной заявки в фирму за проход и не больше max_applications за cooldown_months;
+  - не больше max_applications в фирму за cooldown_months; вторая заявка в фирму за проход — после первых
+    заявок в другие фирмы;
   - apply.daily_limit в сутки, apply.max_per_run за запуск, рабочие часы apply.active_hours;
   - вопросы анкеты без ответа → needs_answers: отвечаете один раз (quant-agent answers), ответ запоминается.
 Режим (apply.mode): assist — Submit жмёте вы; auto — агент; dry_run — без отправки."""
@@ -27,6 +28,7 @@ from .config import Config
 from .db import DB, now
 from .events import log_event
 from .firms import Firm, load_firms
+from .llm import LimitReached
 from .log import console
 from .sources import SourceError, ashby, greenhouse, lever, workable
 
@@ -245,8 +247,9 @@ def _produce(cfg: Config, firms: list[Firm], producing: threading.Event) -> None
         materials.write_letters(cfg, db, min_score=cfg.apply.min_score)
     except stop.Stopped:
         pass
-    except Exception as e:  # noqa: BLE001 — заявки из уже готовой очереди продолжаются
-        console.print(f"[red]Опрос и оценка: {e}[/]")
+    except (Exception, SystemExit) as e:  # noqa: BLE001 — заявки из уже готовой очереди продолжаются;
+        # SystemExit (нет входа в Codex, неверный ключ API) в потоке Python гасит без следа — печатаем сами
+        console.print(f"[red]Опрос и оценка: {escape(str(e))}[/]")
     finally:
         producing.clear()
 
@@ -292,6 +295,14 @@ def run_once(cfg: Config, db: DB, browser: Browser, mode: str | None = None, pol
                 plan = prepare(cfg, db, row)
             except SourceError as e:
                 console.print(f"[red]Вопросы формы не получены[/] {escape(row['firm'])}: {escape(str(e))}")
+                continue
+            except LimitReached as e:  # без LLM анкеты не заполнить — до следующего прохода
+                console.print(f"[red]Лимиты LLM кончились[/] — заявки до следующего прохода: {escape(str(e))}")
+                break
+            except RuntimeError as e:  # модель ответила не по схеме или не ответила — вакансия остаётся в очереди
+                console.print(f"[red]Ответы для анкеты не готовы[/] {escape(row['firm'])} — "
+                              f"{escape(row['title'])}: {escape(str(e)[:200])}")
+                outcomes["error"] += 1
                 continue
             if plan is None:
                 outcomes["needs_answers"] += 1

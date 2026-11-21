@@ -148,3 +148,14 @@ def test_watch_aggregator_adds_new_and_skips_known(cfg, db, monkeypatch):
     assert s.new == 1
     row = db.get(new.uid)
     assert row["status"] == "new" and "Probability" in row["description"] and row["firm"] == "SIG"
+
+
+def test_broken_board_response_does_not_stop_poll(cfg, db, monkeypatch):
+    """ATS поменяла формат: KeyError при разборе — ошибка этой доски, остальные доски опрашиваются."""
+    imc = Firm(name="IMC", ats="greenhouse", token="imc", tier=1)
+    jobs = greenhouse.parse(fixture("greenhouse_jobs.json"), "IMC", "imc")
+    board(monkeypatch, {"optiverus": KeyError("id"), "imc": jobs})
+    fake_llm(monkeypatch)
+    s = watch.run_once(cfg, db, firms=[FIRM, imc])
+    assert s.errors == 1 and s.new > 0
+    assert "KeyError" in next(h for h in db.health() if h["firm"] == "Optiver")["error"]
