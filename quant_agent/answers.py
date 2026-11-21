@@ -55,12 +55,22 @@ def norm(label: str) -> str:
 
 # ── Банк ответов ─────────────────────────────────────────────────────
 
+def _plain(v):
+    """Значение из YAML как текст ответа. YAML 1.1 читает Yes / No / on / off без кавычек как true / false —
+    в анкете это «Yes» / «No», а не «True»."""
+    if isinstance(v, list):
+        return [_plain(x) for x in v]
+    if isinstance(v, bool):
+        return "Yes" if v else "No"
+    return v
+
+
 def load_answers(cfg: Config) -> dict[str, str | list[str]]:
     p = cfg.path(cfg.apply.answers_file)
     if not p.exists():
         return {}
     data = yaml.safe_load(p.read_text(encoding="utf-8")) or {}
-    return {norm(k): v for k, v in data.items()}
+    return {norm(str(k)): _plain(v) for k, v in data.items()}
 
 
 def firm_key(firm: str, label: str) -> str:
@@ -196,6 +206,8 @@ def plan(cfg: Config, row: dict, fields: list[Field], use_llm: bool = True) -> P
         if link and kind == "text":
             if getattr(pr, link):
                 p.steps.append(Step(f.id, f.label, kind, [getattr(pr, link)], "profile"))
+            elif f.required:  # без ссылки форма не уйдёт — спросить вас, а не отправлять пустое поле
+                p.missing.append(dict(id=f.id, label=f.label, options=[], required=True, why=f"нет profile.{link}"))
             continue
         known = lookup(answers, row["firm"], f.label)
         if known is not None:

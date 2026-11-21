@@ -47,6 +47,8 @@ def fetch_all(firms: list[Firm], workers: int) -> list[Poll]:
             return Poll(f, fetch_firm(f))
         except SourceError as e:
             return Poll(f, error=str(e))
+        except Exception as e:  # noqa: BLE001 — ATS поменяла формат ответа: ошибка этой доски, а не всего опроса
+            return Poll(f, error=f"разбор ответа: {type(e).__name__}: {e}")
 
     with ThreadPoolExecutor(max_workers=max(1, workers), thread_name_prefix="board") as ex:
         return list(ex.map(one, firms))

@@ -166,3 +166,26 @@ def test_plan_lever_standard_fields(cfg, tmp_path, monkeypatch):
     assert src["location"] == ("profile", "location", ["Moscow, Moscow City, Russia"])
     assert src["resume"][0] == "resume" and src["urls[LinkedIn]"][2] == ["linkedin.com/in/d"]
     assert all(m["required"] for m in p.missing)   # необязательные без ответа — не вопросы для человека
+
+
+def test_yaml_yes_no_without_quotes(cfg, tmp_path, monkeypatch):
+    """answers.yaml правят руками: «No» без кавычек YAML читает как false — в анкете это всё равно «No»."""
+    setup_profile(cfg, tmp_path)
+    fake_llm(monkeypatch, {})
+    cfg.path("answers.yaml").write_text("Do you require visa sponsorship?: No\nWilling to relocate: yes\n"
+                                        "Which offices?: [London, on]\n", encoding="utf-8")
+    fields = [Field("q1", "Do you require visa sponsorship?", True, "multi_value_single_select", ["Yes", "No"]),
+              Field("q2", "Willing to relocate", True, "input_text"),
+              Field("q3", "Which offices?", True, "multi_value_multi_select", ["London", "Yes", "No"])]
+    p = answers.plan(cfg, ROW, fields)
+    assert not p.missing
+    assert {s.id: s.value for s in p.steps} == {"q1": ["No"], "q2": ["Yes"], "q3": ["London", "Yes"]}
+
+
+def test_required_link_without_profile_asks_you(cfg, tmp_path, monkeypatch):
+    setup_profile(cfg, tmp_path)
+    cfg.profile.github = ""
+    fake_llm(monkeypatch, {})
+    p = answers.plan(cfg, ROW, [Field("q_gh", "GitHub URL", True, "input_text"),
+                                Field("q_web", "Website", False, "input_text")])
+    assert p.steps == [] and [(m["id"], m["why"]) for m in p.missing] == [("q_gh", "нет profile.github")]

@@ -67,6 +67,14 @@ class WorkableApplier(FormApplier):
                 opts.first.click()
             return
         labels = self._labels(opts)
+        wanted = {v.strip().lower() for v in s.value}
+        for i, label in enumerate(labels):  # черновик Workable: галочки прошлого ответа, которых нет в плане, снимаем
+            box = opts.nth(i)
+            if (label not in wanted and box.get_attribute("role") == "checkbox"
+                    and box.get_attribute("aria-checked") == "true"):
+                box.scroll_into_view_if_needed()
+                box.click()
+                self.page.wait_for_timeout(200)
         for v in s.value:
             want = v.strip().lower()
             if want not in labels:
