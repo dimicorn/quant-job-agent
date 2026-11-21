@@ -87,3 +87,5 @@ uv run pytest
 
 Тесты не ходят в сеть и не зовут LLM: ответы досок — в `tests/fixtures/` (сохранены с живых досок и обрезаны),
 LLM подменяется. Личное (`config.yaml`, резюме, база, `.env`, `logs/`) — в `.gitignore`.
+
+Коммиты, CI, релизы и CHANGELOG ([CHANGELOG.md](CHANGELOG.md), git-cliff) — в [CONTRIBUTING.md](CONTRIBUTING.md).
