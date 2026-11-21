@@ -1,0 +1,59 @@
+# git-cliff: CHANGELOG.md из истории коммитов (Conventional Commits). Как пользоваться — CONTRIBUTING.md.
+# Предпросмотр без записи: uvx git-cliff --unreleased -o -
+
+[remote.github]
+owner = "dimicorn"
+repo = "quant-job-agent"
+
+[changelog]
+header = """
+# Changelog
+
+Все заметные изменения quant-job-agent. Формат — [Keep a Changelog](https://keepachangelog.com/ru/1.1.0/),
+версии — [SemVer](https://semver.org/lang/ru/); собирается [git-cliff](https://git-cliff.org) из коммитов.
+"""
+body = """
+{%- set repo_url = "https://github.com/" ~ remote.github.owner ~ "/" ~ remote.github.repo -%}
+{% if version %}
+## [{{ version | trim_start_matches(pat="v") }}]\
+{% if previous.version %}({{ repo_url }}/compare/{{ previous.version }}...{{ version }})\
+{% else %}({{ repo_url }}/releases/tag/{{ version }}){% endif %} — {{ timestamp | date(format="%Y-%m-%d") }}
+{% else %}
+## [Не выпущено]
+{% endif %}\
+{% for group, commits in commits | group_by(attribute="group") %}
+### {{ group | striptags | trim | upper_first }}
+{% for commit in commits %}
+- {% if commit.scope %}**{{ commit.scope }}:** {% endif %}\
+{% if commit.breaking %}⚠️ **несовместимо** — {% endif %}\
+{{ commit.message | split(pat="\n") | first | trim | upper_first }}\
+{% if commit.remote.pr_number %} ([#{{ commit.remote.pr_number }}]({{ repo_url }}/pull/{{ commit.remote.pr_number }}))\
+{% else %} ([`{{ commit.id | truncate(length=7, end="") }}`]({{ repo_url }}/commit/{{ commit.id }})){% endif %}
+{%- endfor %}
+{% endfor %}
+"""
+footer = ""
+trim = true
+output = "CHANGELOG.md"
+
+[git]
+conventional_commits = true
+filter_unconventional = true
+split_commits = false
+protect_breaking_commits = true
+commit_parsers = [
+  { message = "^chore\\(release\\)", skip = true },
+  { message = "^chore\\(deps", skip = true },
+  { message = "^feat", group = "<!-- 0 -->🚀 Новое" },
+  { message = "^fix", group = "<!-- 1 -->🐛 Исправления" },
+  { message = "^perf", group = "<!-- 2 -->⚡ Скорость" },
+  { message = "^refactor", group = "<!-- 3 -->🚜 Рефакторинг" },
+  { message = "^doc", group = "<!-- 4 -->📚 Документация" },
+  { message = "^test", group = "<!-- 5 -->🧪 Тесты" },
+  { message = "^style", group = "<!-- 6 -->🎨 Оформление" },
+  { message = "^ci|^build", group = "<!-- 7 -->🤖 CI и сборка" },
+  { message = "^chore", group = "<!-- 8 -->⚙️ Прочее" },
+  { message = "^revert", group = "<!-- 9 -->◀️ Откаты" },
+  { body = ".*security", group = "<!-- 10 -->🛡️ Безопасность" },
+]
+sort_commits = "newest"
